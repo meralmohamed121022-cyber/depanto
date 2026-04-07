@@ -17,12 +17,12 @@
             font-family: 'Segoe UI', Tahoma, sans-serif;
             display: flex; flex-direction: column; align-items: center;
             min-height: 100vh; color: var(--white); overflow-x: hidden;
-            direction: ltr; /* Page direction LTR */
+            direction: ltr; 
         }
 
         /* --- Auth UI --- */
         #auth-container {
-            margin-top: 8vh; background: var(--white); padding: 30px;
+            margin-top: 5vh; background: var(--white); padding: 30px;
             border-radius: 20px; box-shadow: 10px 10px 0px var(--orange);
             width: 85%; max-width: 380px; color: #333; text-align: center; border: 3px solid var(--book-spine);
         }
@@ -35,19 +35,18 @@
         /* --- App UI --- */
         #journal-app { display: none; width: 100%; flex-direction: column; align-items: center; }
         
-        /* Top Bar & Animated Text Avatar */
         .top-bar { width: 92%; display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
         .user-profile { display: flex; align-items: center; gap: 12px; }
         
-        .avatar-box {
+        /* Animated Word Avatar */
+        .avatar-word {
             background: var(--orange); color: white;
-            padding: 8px 20px; border-radius: 30px;
-            font-weight: bold; font-size: 16px; border: 2px solid white;
-            animation: bounce 2s infinite ease-in-out;
+            padding: 8px 18px; border-radius: 30px;
+            font-weight: bold; font-size: 15px; border: 2px solid white;
+            animation: bounce 2.5s infinite ease-in-out;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             text-transform: uppercase; letter-spacing: 1px;
         }
-
         @keyframes bounce {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
@@ -72,63 +71,62 @@
         .today-btn { background: var(--orange); color: white; border: none; padding: 10px; border-radius: 10px; cursor: pointer; font-weight: bold; margin-top: 15px; font-size: 12px; }
         .file-upload-art { border: 2px dashed var(--orange); background: #fffbf5; padding: 15px; border-radius: 10px; text-align: center; cursor: pointer; margin-bottom: 10px; font-size: 14px; }
 
-        /* --- RTL Journal Grid --- */
+        /* --- Journal Grid (RTL for Card Flow) --- */
         .day-header { background: var(--orange); color: white; padding: 8px 25px; border-radius: 0 30px 30px 0; margin: 15px 0; font-weight: bold; align-self: flex-end; margin-right: 5%; }
         
         .journal-row {
             display: flex; gap: 20px; padding: 15px 20px 35px 20px;
             overflow-x: auto; width: 100%; box-sizing: border-box;
             scroll-snap-type: x mandatory;
-            direction: rtl; /* Cards scroll from Right to Left */
+            direction: rtl; /* Cards flow from Right to Left */
         }
 
-        .journal-row::-webkit-scrollbar { height: 10px; display: block; }
+        .journal-row::-webkit-scrollbar { height: 8px; display: block; }
         .journal-row::-webkit-scrollbar-thumb { background: var(--orange); border-radius: 10px; border: 2px solid var(--dark-blue); }
 
         .note-card {
             min-width: 290px; max-width: 290px; background: var(--paper); color: #333;
             padding: 20px; border-radius: 5px 20px 20px 5px; box-shadow: 5px 5px 15px rgba(0,0,0,0.3);
             border-right: 12px solid var(--book-spine); scroll-snap-align: center; display: flex; flex-direction: column; position: relative;
-            direction: ltr; /* Text inside card stays LTR for English */
+            direction: ltr; /* English text inside stays LTR */
         }
-        .card-actions { position: absolute; top: 10px; left: 10px; display: flex; gap: 10px; }
-        .action-btn { border: none; background: rgba(0,0,0,0.05); padding: 6px; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        .card-actions { position: absolute; top: 8px; left: 8px; display: flex; gap: 10px; }
+        .action-btn { border: none; background: rgba(0,0,0,0.05); padding: 5px; border-radius: 5px; cursor: pointer; font-size: 16px; }
         
-        .media-box { width: 100%; border-radius: 10px; margin: 12px 0; cursor: zoom-in; max-height: 160px; object-fit: cover; background: #eee; }
+        .media-box { width: 100%; border-radius: 10px; margin: 12px 0; cursor: zoom-in; max-height: 160px; object-fit: cover; background: #eee; border: 1px solid #ddd; }
         
         /* --- Modal & Custom Alerts --- */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 3000; padding: 10px; }
-        .modal-content { background: white; padding: 25px; border-radius: 20px; width: 95vw; max-width: 500px; color: #333; max-height: 85vh; overflow-y: auto; text-align: center; }
+        .modal-content { background: white; padding: 25px; border-radius: 20px; width: 95vw; max-width: 500px; color: #333; max-height: 85vh; overflow-y: auto; text-align: center; position: relative; }
         .alert-btns { display: flex; gap: 10px; margin-top: 20px; }
         .alert-btn { flex: 1; padding: 12px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; }
 
         #lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; justify-content: center; align-items: center; z-index: 4000; }
-        #lightbox img { max-width: 95%; max-height: 85%; border-radius: 5px; border: 2px solid white; }
+        #lightbox img, #lightbox video { max-width: 95%; max-height: 85%; border-radius: 5px; border: 2px solid white; }
     </style>
 </head>
 <body>
 
     <div id="auth-container">
-        <h2 id="auth-title">Journal Access 🔒</h2>
+        <h2 id="auth-title">Mo's Vault 🔒</h2>
         <div class="auth-tabs">
             <div id="tab-login" class="auth-tab active" onclick="setMode('login')">Login</div>
-            <div id="tab-register" class="auth-tab" onclick="setMode('register')">Sign Up</div>
+            <div id="tab-register" class="auth-tab" onclick="setMode('register')">Register</div>
         </div>
         <input type="text" id="auth-user" class="auth-input" placeholder="Username">
         <input type="password" id="auth-pass" class="auth-input" placeholder="Password">
-        <button class="auth-btn" id="auth-btn" onclick="handleAuth()">Enter Vault ✨</button>
+        <button class="auth-btn" id="auth-btn" onclick="handleAuth()">Enter ✨</button>
     </div>
 
     <div id="journal-app">
         <div class="top-bar">
             <div class="user-profile">
-                <div class="avatar-box" id="user-avatar-text">NAME</div>
-                <span id="user-display" style="font-size:14px; font-weight:bold;">Hello</span>
+                <div class="avatar-word" id="user-avatar-text">NAME</div>
             </div>
             <button class="logout-btn" onclick="logout()">Logout</button>
         </div>
 
-        <input type="text" id="fuzzySearch" class="search-box" placeholder="Fuzzy search titles or content..." oninput="runSearch()">
+        <input type="text" id="fuzzySearch" class="search-box" placeholder="Search titles or content..." oninput="runSearch()">
 
         <div class="nav-tabs">
             <button id="tabActive" class="tab-btn active" onclick="changeView('active')">My Notes</button>
@@ -136,8 +134,8 @@
         </div>
 
         <div class="glass-input" id="entryForm">
-            <input type="text" id="noteTitle" placeholder="Entry Title">
-            <textarea id="noteText" rows="3" placeholder="Write your thoughts..."></textarea>
+            <input type="text" id="noteTitle" placeholder="Note Title">
+            <textarea id="noteText" rows="3" placeholder="What's on your mind?"></textarea>
             <div class="datetime-row">
                 <div><label style="font-size:10px;">Date</label><input type="date" id="noteDate"></div>
                 <div><label style="font-size:10px;">Time</label><input type="time" id="noteTime"></div>
@@ -145,9 +143,9 @@
             </div>
             <div class="file-upload-art" onclick="document.getElementById('noteFile').click()">
                 <span id="fileLabel">Attach Media 🖼️</span>
-                <input type="file" id="noteFile" hidden onchange="document.getElementById('fileLabel').innerText='Attached ✅'">
+                <input type="file" id="noteFile" hidden onchange="document.getElementById('fileLabel').innerText='File Ready ✅'">
             </div>
-            <button id="mainSaveBtn" class="auth-btn" style="background:var(--dark-blue)" onclick="handleSave()">Save Entry ✨</button>
+            <button id="mainSaveBtn" class="auth-btn" style="background:var(--dark-blue)" onclick="handleSave()">Save Now ✨</button>
         </div>
 
         <div id="notesLayout" style="width: 100%;"></div>
@@ -156,7 +154,7 @@
     <div id="confirmModal" class="modal">
         <div class="modal-content">
             <h3 style="color: var(--dark-blue);">Are you sure? 🗑️</h3>
-            <p>This action cannot be undone.</p>
+            <p>This entry will be permanently deleted.</p>
             <div class="alert-btns">
                 <button class="alert-btn" style="background: #eee;" onclick="closeConfirm()">Cancel</button>
                 <button id="finalDeleteBtn" class="alert-btn" style="background: #ff4444; color: white;">Yes, Delete</button>
@@ -164,19 +162,27 @@
         </div>
     </div>
 
+    <div id="alertModal" class="modal">
+        <div class="modal-content">
+            <h3 id="alertTitle">Alert</h3>
+            <p id="alertMsg"></p>
+            <button class="alert-btn" style="background: var(--dark-blue); color:white; width:100%;" onclick="this.parentElement.parentElement.style.display='none'">OK</button>
+        </div>
+    </div>
+
     <div id="editModal" class="modal">
         <div class="modal-content">
-            <h3 style="margin-top:0;">Edit Note ✏️</h3>
+            <h3 style="margin-top:0;">Edit Entry ✏️</h3>
             <input type="text" id="editTitle" class="auth-input">
             <textarea id="editText" rows="5" class="auth-input"></textarea>
             <label style="font-size:12px;">Change Date</label>
             <input type="date" id="editDate" class="auth-input">
             <div id="currentEditImg" style="margin-bottom:15px;"></div>
             <div class="file-upload-art" onclick="document.getElementById('editFile').click()">
-                <span id="editFileLabel">Replace Media 🔄</span>
-                <input type="file" id="editFile" hidden onchange="document.getElementById('editFileLabel').innerText='New File Ready ✅'">
+                <span id="editFileLabel">Update Media 🔄</span>
+                <input type="file" id="editFile" hidden onchange="document.getElementById('editFileLabel').innerText='New media ready ✅'">
             </div>
-            <button id="updateBtn" class="auth-btn" onclick="updateNote()">Update Now</button>
+            <button id="updateBtn" class="auth-btn" onclick="updateNote()">Update</button>
             <button class="auth-btn" style="background:#eee; color:#333; margin-top:10px;" onclick="closeModal()">Cancel</button>
         </div>
     </div>
@@ -190,6 +196,12 @@
 
         let authMode = 'login', currentView = 'active', rawData = [], currentUser = localStorage.getItem('mo_user'), editId = null, currentMediaUrl = null;
 
+        function showCustomAlert(title, msg) {
+            document.getElementById('alertTitle').innerText = title;
+            document.getElementById('alertMsg').innerText = msg;
+            document.getElementById('alertModal').style.display = 'flex';
+        }
+
         function setToday() {
             const now = new Date();
             document.getElementById('noteDate').value = now.toISOString().split('T')[0];
@@ -198,21 +210,21 @@
 
         function setMode(m) {
             authMode = m;
-            document.getElementById('auth-title').innerText = m === 'login' ? 'Journal Access 🔒' : 'Create Vault ✨';
-            document.getElementById('auth-btn').innerText = m === 'login' ? 'Enter Vault ✨' : 'Join Now ✨';
+            document.getElementById('auth-title').innerText = m === 'login' ? "Mo's Vault 🔒" : "Join the Vault ✨";
+            document.getElementById('auth-btn').innerText = m === 'login' ? 'Enter ✨' : 'Register ✨';
             document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
             document.getElementById('tab-'+m).classList.add('active');
         }
 
         async function handleAuth() {
             const user = document.getElementById('auth-user').value, pass = document.getElementById('auth-pass').value;
-            if(!user || !pass) return showAlert("Please fill fields!");
+            if(!user || !pass) return showCustomAlert("Error", "Please fill all fields!");
             if(authMode === 'register') {
                 const { error } = await _supabase.from('journal_users').insert([{ username: user, password: pass }]);
-                if(error) alert("Username taken!"); else alert("Registered! You can login.");
+                if(error) showCustomAlert("Error", "Username taken!"); else showCustomAlert("Success", "Account created! Please Login.");
             } else {
                 const { data } = await _supabase.from('journal_users').select('*').eq('username', user).eq('password', pass).single();
-                if(data) { localStorage.setItem('mo_user', user); location.reload(); } else alert("Access Denied!");
+                if(data) { localStorage.setItem('mo_user', user); location.reload(); } else showCustomAlert("Error", "Access Denied!");
             }
         }
 
@@ -226,8 +238,8 @@
         async function handleSave() {
             const btn = document.getElementById('mainSaveBtn');
             const content = document.getElementById('noteText').value;
-            if(!content) return alert("Empty Note!");
-            btn.disabled = true; btn.innerText = "Storing...";
+            if(!content) return showCustomAlert("Wait", "Note cannot be empty!");
+            btn.disabled = true; btn.innerText = "Processing...";
             const file = document.getElementById('noteFile').files[0];
             const d = document.getElementById('noteDate').value;
             const t = document.getElementById('noteTime').value;
@@ -239,6 +251,7 @@
 
         async function fetchNotes() {
             const isHis = currentView === 'history';
+            // Latest First by created_at
             const { data } = await _supabase.from('notes').select('*').eq('owner_name', currentUser).eq('is_completed', isHis).order('created_at', {ascending: false});
             rawData = data || [];
             renderStructure(rawData);
@@ -334,7 +347,6 @@
         if(currentUser) {
             document.getElementById('auth-container').style.display = 'none';
             document.getElementById('journal-app').style.display = 'flex';
-            document.getElementById('user-display').innerText = `Welcome, ${currentUser}`;
             const firstWord = currentUser.split(' ')[0].toUpperCase();
             document.getElementById('user-avatar-text').innerText = firstWord;
             fetchNotes();
