@@ -242,8 +242,14 @@
 
     let currentView = 'active', rawData = [], currentUser = localStorage.getItem('mo_user'), editId = null, tempEditMedia = [];
 
-    function showCustomAlert(t, m) { document.getElementById('alertTitle').innerText = t; document.getElementById('alertMsg').innerText = m; document.getElementById('alertModal').style.display = 'block'; }
-    function setToday() { const n = new Date(); document.getElementById('noteDate').value = n.toISOString().split('T')[0]; document.getElementById('noteTime').value = n.toTimeString().slice(0,5); }
+    function setToday() {
+        const n = new Date();
+        const year = n.getFullYear();
+        const month = String(n.getMonth() + 1).padStart(2, '0');
+        const day = String(n.getDate()).padStart(2, '0');
+        document.getElementById('noteDate').value = `${year}-${month}-${day}`;
+        document.getElementById('noteTime').value = n.toTimeString().slice(0,5);
+    }
     function setMode(m) {
         document.getElementById('auth-title').innerText = m === 'login' ? "Mo's Vault 🔒" : "Join the Vault ✨";
         document.getElementById('auth-btn').innerText = m === 'login' ? 'Enter ✨' : 'Register ✨';
@@ -279,7 +285,14 @@
         const file = document.getElementById('noteFile').files[0];
         const url = await uploadFile(file);
         const d = document.getElementById('noteDate').value, t = document.getElementById('noteTime').value;
-        const reminder = d ? (t ? `${d}T${t}` : `${d}T00:00:00`) : null;
+
+        let reminder = null;
+        if (d) {
+            // إنشاء تاريخ محلي بناءً على المدخلات
+            const localDate = t ? new Date(`${d}T${t}`) : new Date(`${d}T00:00:00`);
+            reminder = localDate.toISOString(); // تحويله لـ UTC بشكل صحيح للإرسال
+        }
+
         await _supabase.from('notes').insert([{ title: document.getElementById('noteTitle').value || "Untitled", content, media_url: url, owner_name: currentUser, reminder_at: reminder, is_completed: false }]);
         location.reload();
     }
@@ -384,7 +397,12 @@
         const btn = document.getElementById('updateBtn'); btn.disabled = true; btn.innerText = "Saving...";
         const finalMediaStr = tempEditMedia.join('||');
         const d = document.getElementById('editDate').value, t = document.getElementById('editTime').value;
-        const reminder = d ? (t ? `${d}T${t}` : `${d}T00:00:00`) : null;
+
+        let reminder = null;
+        if (d) {
+            const localDate = t ? new Date(`${d}T${t}`) : new Date(`${d}T00:00:00`);
+            reminder = localDate.toISOString();
+        }
 
         await _supabase.from('notes').update({
             title: document.getElementById('editTitle').value,
@@ -397,8 +415,11 @@
 
     // --- Countdown & Alarm Logic ---
     let activeAlarms = new Set();
+    let vibrationInterval = null;
+    let isAlarmActive = false;
 
     function updateAllCountdowns() {
+        if (isAlarmActive) return; // Stop checking if an alarm is already ringing
         document.querySelectorAll('.countdown-timer').forEach(el => {
             const target = new Date(el.dataset.time).getTime();
             const now = new Date().getTime();
@@ -407,9 +428,10 @@
             if (diff <= 0) {
                 el.innerText = "Due!";
                 el.style.color = "red";
-                // Trigger Alarm
                 const noteId = el.id.replace('timer-', '');
-                triggerAlarm(noteId);
+                if (diff > -60000) {
+                    triggerAlarm(noteId);
+                }
             } else {
                 const hours = Math.floor(diff / (1000 * 60 * 60));
                 const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
@@ -420,26 +442,69 @@
     }
 
     function triggerAlarm(id) {
-        if (activeAlarms.has(id)) return;
+        if (isAlarmActive || activeAlarms.has(id)) return;
         const note = rawData.find(n => n.id == id);
         if (!note || note.is_completed) return;
 
+        isAlarmActive = true;
         activeAlarms.add(id);
+
         document.getElementById('alarmNoteTitle').innerText = note.title;
         document.getElementById('alarmNoteContent').innerText = note.content;
         document.getElementById('alarmModal').style.display = 'block';
+
         const audio = document.getElementById('alarmAudio');
-        audio.play().catch(e => console.log("Audio play blocked"));
+        audio.currentTime = 0;
+        const playPromise = audio.play();
+
+        if (playPromise !== undefined) {
+            playPromise.catch(e => {
+                console.log("Audio play blocked");
+                document.body.addEventListener('click', () => audio.play(), { once: true });
+            });
+        }
+
+        // Start Vibration
+        if (navigator.vibrate) {
+            navigator.vibrate([500, 300, 500, 300, 500]);
+            if (vibrationInterval) clearInterval(vibrationInterval);
+            vibrationInterval = setInterval(() => {
+                if (isAlarmActive) navigator.vibrate([500, 300, 500, 300, 500]);
+                else clearInterval(vibrationInterval);
+            }, 2000);
+        }
     }
 
     function stopAlarm() {
+        isAlarmActive = false;
         document.getElementById('alarmModal').style.display = 'none';
+
         const audio = document.getElementById('alarmAudio');
         audio.pause();
         audio.currentTime = 0;
-        // Optional: mark as done or just clear from active set
-        // activeAlarms.clear();
+
+        if (vibrationInterval) {
+            clearInterval(vibrationInterval);
+            vibrationInterval = null;
+        }
+        if (navigator.vibrate) navigator.vibrate(0);
     }
+
+    // Stop alarm on Flip (face down) or significant movement
+    window.addEventListener('deviceorientation', (event) => {
+        if (isAlarmActive) {
+            const beta = event.beta; // rotation around X axis [-180, 180]
+            // If phone is face down (beta is around 180 or -180)
+            if (Math.abs(beta) > 160) {
+                stopAlarm();
+            }
+        }
+    });
+
+    // Stop alarm on any key press (volume etc)
+    window.addEventListener('keydown', () => {
+        if (isAlarmActive) stopAlarm();
+    });
 
     setInterval(updateAllCountdowns, 1000);
 
