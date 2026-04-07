@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,126 +17,167 @@
             font-family: 'Segoe UI', Tahoma, sans-serif;
             display: flex; flex-direction: column; align-items: center;
             min-height: 100vh; color: var(--white); overflow-x: hidden;
+            direction: ltr; /* Page direction LTR */
         }
 
-        /* Auth UI */
+        /* --- Auth UI --- */
         #auth-container {
-            margin-top: 80px; background: var(--white); padding: 40px;
-            border-radius: 30px; box-shadow: 20px 20px 0px var(--orange);
-            width: 90%; max-width: 400px; color: #333; text-align: center; border: 4px solid var(--book-spine);
+            margin-top: 8vh; background: var(--white); padding: 30px;
+            border-radius: 20px; box-shadow: 10px 10px 0px var(--orange);
+            width: 85%; max-width: 380px; color: #333; text-align: center; border: 3px solid var(--book-spine);
         }
-        .auth-tabs { display: flex; margin-bottom: 25px; background: #eee; border-radius: 50px; padding: 5px; }
-        .auth-tab { flex: 1; padding: 10px; cursor: pointer; border-radius: 50px; font-weight: bold; }
+        .auth-tabs { display: flex; margin-bottom: 20px; background: #eee; border-radius: 50px; padding: 4px; }
+        .auth-tab { flex: 1; padding: 10px; cursor: pointer; border-radius: 50px; font-weight: bold; font-size: 14px; }
         .auth-tab.active { background: var(--orange); color: white; }
-        .auth-input { width: 100%; padding: 15px; margin-bottom: 15px; border: 2px solid #ddd; border-radius: 12px; outline: none; box-sizing: border-box; }
-        .auth-btn { background: var(--dark-blue); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 18px; }
+        .auth-input { width: 100%; padding: 14px; margin-bottom: 12px; border: 2px solid #ddd; border-radius: 12px; outline: none; box-sizing: border-box; font-size: 16px; }
+        .auth-btn { background: var(--dark-blue); color: white; border: none; width: 100%; padding: 14px; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 16px; }
 
-        /* App UI */
+        /* --- App UI --- */
         #journal-app { display: none; width: 100%; flex-direction: column; align-items: center; }
-        .top-bar { width: 90%; display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
-        .logout-btn { background: none; border: 1px solid white; color: white; padding: 5px 15px; border-radius: 20px; cursor: pointer; }
-        .search-box { width: 85%; max-width: 800px; padding: 15px; border-radius: 50px; border: 3px solid var(--orange); background: var(--glass); color: white; margin: 20px 0; outline: none; }
-        .nav-tabs { margin-bottom: 25px; display: flex; gap: 15px; }
-        .tab-btn { background: transparent; border: 2px solid var(--orange); color: white; padding: 10px 30px; border-radius: 50px; cursor: pointer; }
-        .tab-btn.active { background: var(--orange); box-shadow: 0 0 15px var(--orange); }
+        
+        /* Top Bar & Animated Text Avatar */
+        .top-bar { width: 92%; display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
+        .user-profile { display: flex; align-items: center; gap: 12px; }
+        
+        .avatar-box {
+            background: var(--orange); color: white;
+            padding: 8px 20px; border-radius: 30px;
+            font-weight: bold; font-size: 16px; border: 2px solid white;
+            animation: bounce 2s infinite ease-in-out;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            text-transform: uppercase; letter-spacing: 1px;
+        }
 
-        /* CSS Art Form */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .logout-btn { background: none; border: 1px solid white; color: white; padding: 6px 15px; border-radius: 20px; cursor: pointer; font-size: 12px; }
+        .search-box { width: 90%; max-width: 600px; padding: 12px 20px; border-radius: 50px; border: 2px solid var(--orange); background: var(--glass); color: white; margin: 15px 0; outline: none; }
+        
+        .nav-tabs { margin-bottom: 20px; display: flex; gap: 10px; }
+        .tab-btn { background: transparent; border: 2px solid var(--orange); color: white; padding: 8px 25px; border-radius: 50px; cursor: pointer; font-size: 14px; }
+        .tab-btn.active { background: var(--orange); box-shadow: 0 0 10px var(--orange); }
+
+        /* --- Form UI --- */
         .glass-input {
-            background: var(--white); padding: 30px; border-radius: 25px;
-            width: 90%; max-width: 650px; box-shadow: 15px 15px 0px var(--orange);
-            border: 4px solid var(--book-spine); color: #333; margin-bottom: 40px;
+            background: var(--white); padding: 20px; border-radius: 20px;
+            width: 90%; max-width: 600px; box-shadow: 10px 10px 0px var(--orange);
+            border: 3px solid var(--book-spine); color: #333; margin-bottom: 30px;
         }
-        .glass-input input, .glass-input textarea { width: 100%; border: 2px solid #eee; border-radius: 12px; padding: 12px; margin-bottom: 15px; box-sizing: border-box; }
-        
-        .datetime-row { display: flex; gap: 10px; align-items: center; margin-bottom: 15px; }
+        .glass-input input, .glass-input textarea { width: 100%; border: 1px solid #eee; border-radius: 10px; padding: 12px; margin-bottom: 10px; box-sizing: border-box; }
+        .datetime-row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
         .datetime-row div { flex: 1; }
-        .today-btn { background: var(--orange); color: white; border: none; padding: 12px 15px; border-radius: 12px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .today-btn { background: var(--orange); color: white; border: none; padding: 10px; border-radius: 10px; cursor: pointer; font-weight: bold; margin-top: 15px; font-size: 12px; }
+        .file-upload-art { border: 2px dashed var(--orange); background: #fffbf5; padding: 15px; border-radius: 10px; text-align: center; cursor: pointer; margin-bottom: 10px; font-size: 14px; }
 
-        .file-upload-art { border: 3px dashed var(--orange); background: #fffbf5; padding: 20px; border-radius: 15px; text-align: center; cursor: pointer; margin-bottom: 15px; }
-
-        /* Card Art */
-        .day-header { background: var(--orange); color: white; padding: 10px 30px; border-radius: 0 50px 50px 0; margin: 20px 0; font-weight: bold; }
-        .journal-row { display: flex; gap: 30px; padding: 20px; overflow-x: auto; width: 95%; scroll-snap-type: x mandatory; }
-        .note-card {
-            min-width: 320px; max-width: 320px; background: var(--paper); color: #333;
-            padding: 25px; border-radius: 5px 25px 25px 5px; box-shadow: 10px 10px 20px rgba(0,0,0,0.4);
-            border-right: 15px solid var(--book-spine); scroll-snap-align: center; display: flex; flex-direction: column; position: relative;
-        }
-        .card-actions { position: absolute; top: 10px; left: 10px; display: flex; gap: 5px; }
-        .action-btn { border: none; background: rgba(0,0,0,0.1); padding: 5px; border-radius: 5px; cursor: pointer; font-size: 14px; }
-        .action-btn.del { color: red; }
-        .action-btn.edit { color: blue; }
-
-        .media-box { width: 100%; border-radius: 12px; margin: 15px 0; cursor: zoom-in; max-height: 180px; object-fit: cover; background: #eee; }
+        /* --- RTL Journal Grid --- */
+        .day-header { background: var(--orange); color: white; padding: 8px 25px; border-radius: 0 30px 30px 0; margin: 15px 0; font-weight: bold; align-self: flex-end; margin-right: 5%; }
         
-        /* Modal Style */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 3000; }
-        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 90%; max-width: 500px; color: #333; overflow-y: auto; max-height: 90vh; }
+        .journal-row {
+            display: flex; gap: 20px; padding: 15px 20px 35px 20px;
+            overflow-x: auto; width: 100%; box-sizing: border-box;
+            scroll-snap-type: x mandatory;
+            direction: rtl; /* Cards scroll from Right to Left */
+        }
 
-        #lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 4000; }
-        #lightbox img { max-width: 90%; max-height: 90%; border: 3px solid white; border-radius: 10px; }
+        .journal-row::-webkit-scrollbar { height: 10px; display: block; }
+        .journal-row::-webkit-scrollbar-thumb { background: var(--orange); border-radius: 10px; border: 2px solid var(--dark-blue); }
+
+        .note-card {
+            min-width: 290px; max-width: 290px; background: var(--paper); color: #333;
+            padding: 20px; border-radius: 5px 20px 20px 5px; box-shadow: 5px 5px 15px rgba(0,0,0,0.3);
+            border-right: 12px solid var(--book-spine); scroll-snap-align: center; display: flex; flex-direction: column; position: relative;
+            direction: ltr; /* Text inside card stays LTR for English */
+        }
+        .card-actions { position: absolute; top: 10px; left: 10px; display: flex; gap: 10px; }
+        .action-btn { border: none; background: rgba(0,0,0,0.05); padding: 6px; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        
+        .media-box { width: 100%; border-radius: 10px; margin: 12px 0; cursor: zoom-in; max-height: 160px; object-fit: cover; background: #eee; }
+        
+        /* --- Modal & Custom Alerts --- */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 3000; padding: 10px; }
+        .modal-content { background: white; padding: 25px; border-radius: 20px; width: 95vw; max-width: 500px; color: #333; max-height: 85vh; overflow-y: auto; text-align: center; }
+        .alert-btns { display: flex; gap: 10px; margin-top: 20px; }
+        .alert-btn { flex: 1; padding: 12px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; }
+
+        #lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; justify-content: center; align-items: center; z-index: 4000; }
+        #lightbox img { max-width: 95%; max-height: 85%; border-radius: 5px; border: 2px solid white; }
     </style>
 </head>
 <body>
 
     <div id="auth-container">
-        <h2 id="auth-title">خزنة Mo السرية 🔐</h2>
+        <h2 id="auth-title">Journal Access 🔒</h2>
         <div class="auth-tabs">
-            <div id="tab-login" class="auth-tab active" onclick="setMode('login')">دخول</div>
-            <div id="tab-register" class="auth-tab" onclick="setMode('register')">تسجيل جديد</div>
+            <div id="tab-login" class="auth-tab active" onclick="setMode('login')">Login</div>
+            <div id="tab-register" class="auth-tab" onclick="setMode('register')">Sign Up</div>
         </div>
-        <input type="text" id="auth-user" class="auth-input" placeholder="اسم المستخدم">
-        <input type="password" id="auth-pass" class="auth-input" placeholder="كلمة المرور">
-        <button class="auth-btn" id="auth-btn" onclick="handleAuth()">دخول الآن ✨</button>
+        <input type="text" id="auth-user" class="auth-input" placeholder="Username">
+        <input type="password" id="auth-pass" class="auth-input" placeholder="Password">
+        <button class="auth-btn" id="auth-btn" onclick="handleAuth()">Enter Vault ✨</button>
     </div>
 
     <div id="journal-app">
         <div class="top-bar">
-            <h1>مفكرة <span id="user-display" style="color:var(--orange)"></span> 📓</h1>
-            <button class="logout-btn" onclick="logout()">خروج</button>
+            <div class="user-profile">
+                <div class="avatar-box" id="user-avatar-text">NAME</div>
+                <span id="user-display" style="font-size:14px; font-weight:bold;">Hello</span>
+            </div>
+            <button class="logout-btn" onclick="logout()">Logout</button>
         </div>
 
-        <input type="text" id="fuzzySearch" class="search-box" placeholder="ابحث في أفكارك..." oninput="runSearch()">
+        <input type="text" id="fuzzySearch" class="search-box" placeholder="Fuzzy search titles or content..." oninput="runSearch()">
 
         <div class="nav-tabs">
-            <button id="tabActive" class="tab-btn active" onclick="changeView('active')">المفكرة</button>
-            <button id="tabHistory" class="tab-btn" onclick="changeView('history')">الأرشيف</button>
+            <button id="tabActive" class="tab-btn active" onclick="changeView('active')">My Notes</button>
+            <button id="tabHistory" class="tab-btn" onclick="changeView('history')">Archive</button>
         </div>
 
         <div class="glass-input" id="entryForm">
-            <input type="text" id="noteTitle" placeholder="عنوان الملحوظة...">
-            <textarea id="noteText" rows="4" placeholder="ماذا يدور في ذهنك يا Mo؟"></textarea>
+            <input type="text" id="noteTitle" placeholder="Entry Title">
+            <textarea id="noteText" rows="3" placeholder="Write your thoughts..."></textarea>
             <div class="datetime-row">
-                <div><label style="font-size:11px;">التاريخ</label><input type="date" id="noteDate"></div>
-                <div><label style="font-size:11px;">الوقت</label><input type="time" id="noteTime"></div>
-                <button class="today-btn" onclick="setToday()">اليوم 📅</button>
+                <div><label style="font-size:10px;">Date</label><input type="date" id="noteDate"></div>
+                <div><label style="font-size:10px;">Time</label><input type="time" id="noteTime"></div>
+                <button class="today-btn" onclick="setToday()">Today</button>
             </div>
             <div class="file-upload-art" onclick="document.getElementById('noteFile').click()">
-                <span id="fileLabel">ارفق صورة أو فيديو 🖼️</span>
-                <input type="file" id="noteFile" hidden onchange="document.getElementById('fileLabel').innerText='تم الاختيار ✅'">
+                <span id="fileLabel">Attach Media 🖼️</span>
+                <input type="file" id="noteFile" hidden onchange="document.getElementById('fileLabel').innerText='Attached ✅'">
             </div>
-            <button id="mainSaveBtn" class="auth-btn" style="background:var(--dark-blue)" onclick="handleSave()">حفظ في الخزنة ✨</button>
+            <button id="mainSaveBtn" class="auth-btn" style="background:var(--dark-blue)" onclick="handleSave()">Save Entry ✨</button>
         </div>
 
         <div id="notesLayout" style="width: 100%;"></div>
     </div>
 
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <h3 style="color: var(--dark-blue);">Are you sure? 🗑️</h3>
+            <p>This action cannot be undone.</p>
+            <div class="alert-btns">
+                <button class="alert-btn" style="background: #eee;" onclick="closeConfirm()">Cancel</button>
+                <button id="finalDeleteBtn" class="alert-btn" style="background: #ff4444; color: white;">Yes, Delete</button>
+            </div>
+        </div>
+    </div>
+
     <div id="editModal" class="modal">
         <div class="modal-content">
-            <h3>تعديل الملحوظة 📝</h3>
+            <h3 style="margin-top:0;">Edit Note ✏️</h3>
             <input type="text" id="editTitle" class="auth-input">
-            <textarea id="editText" rows="4" class="auth-input"></textarea>
+            <textarea id="editText" rows="5" class="auth-input"></textarea>
+            <label style="font-size:12px;">Change Date</label>
             <input type="date" id="editDate" class="auth-input">
-            
-            <div id="currentEditImg" style="margin-bottom:10px;"></div>
-            
+            <div id="currentEditImg" style="margin-bottom:15px;"></div>
             <div class="file-upload-art" onclick="document.getElementById('editFile').click()">
-                <span id="editFileLabel">تغيير الصورة/الفيديو 🖼️</span>
-                <input type="file" id="editFile" hidden onchange="document.getElementById('editFileLabel').innerText='تم اختيار ملف جديد ✅'">
+                <span id="editFileLabel">Replace Media 🔄</span>
+                <input type="file" id="editFile" hidden onchange="document.getElementById('editFileLabel').innerText='New File Ready ✅'">
             </div>
-            
-            <button id="updateBtn" class="auth-btn" onclick="updateNote()">تحديث ✅</button>
-            <button class="auth-btn" style="background:grey; margin-top:10px;" onclick="closeModal()">إلغاء</button>
+            <button id="updateBtn" class="auth-btn" onclick="updateNote()">Update Now</button>
+            <button class="auth-btn" style="background:#eee; color:#333; margin-top:10px;" onclick="closeModal()">Cancel</button>
         </div>
     </div>
 
@@ -157,21 +198,21 @@
 
         function setMode(m) {
             authMode = m;
-            document.getElementById('auth-title').innerText = m === 'login' ? 'خزنة Mo السرية 🔐' : 'إنشاء حساب جديد ✨';
-            document.getElementById('auth-btn').innerText = m === 'login' ? 'دخول الآن ✨' : 'إنشاء الحساب ✨';
-            document.getElementById('tab-login').classList.toggle('active', m === 'login');
-            document.getElementById('tab-register').classList.toggle('active', m === 'register');
+            document.getElementById('auth-title').innerText = m === 'login' ? 'Journal Access 🔒' : 'Create Vault ✨';
+            document.getElementById('auth-btn').innerText = m === 'login' ? 'Enter Vault ✨' : 'Join Now ✨';
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-'+m).classList.add('active');
         }
 
         async function handleAuth() {
             const user = document.getElementById('auth-user').value, pass = document.getElementById('auth-pass').value;
-            if(!user || !pass) return alert("اكمل البيانات");
+            if(!user || !pass) return showAlert("Please fill fields!");
             if(authMode === 'register') {
                 const { error } = await _supabase.from('journal_users').insert([{ username: user, password: pass }]);
-                if(error) alert("الاسم مستخدم بالفعل"); else alert("تم التسجيل!");
+                if(error) alert("Username taken!"); else alert("Registered! You can login.");
             } else {
                 const { data } = await _supabase.from('journal_users').select('*').eq('username', user).eq('password', pass).single();
-                if(data) { localStorage.setItem('mo_user', user); location.reload(); } else alert("بيانات غلط!");
+                if(data) { localStorage.setItem('mo_user', user); location.reload(); } else alert("Access Denied!");
             }
         }
 
@@ -179,31 +220,26 @@
             if(!file) return null;
             const name = `${Date.now()}_${file.name}`;
             const { data, error } = await _supabase.storage.from('media').upload(name, file);
-            if(error) { console.error(error); return null; }
-            return _supabase.storage.from('media').getPublicUrl(name).data.publicUrl;
+            return error ? null : _supabase.storage.from('media').getPublicUrl(name).data.publicUrl;
         }
 
         async function handleSave() {
             const btn = document.getElementById('mainSaveBtn');
-            const title = document.getElementById('noteTitle').value || "بدون عنوان";
             const content = document.getElementById('noteText').value;
+            if(!content) return alert("Empty Note!");
+            btn.disabled = true; btn.innerText = "Storing...";
             const file = document.getElementById('noteFile').files[0];
-            const dInput = document.getElementById('noteDate').value;
-            const tInput = document.getElementById('noteTime').value;
-
-            if(!content) return alert("اكتب المحتوى!");
-            btn.disabled = true; btn.innerText = "جاري الحفظ... ⏳";
-            
-            let reminderAt = dInput ? (tInput ? `${dInput}T${tInput}` : `${dInput}T00:00:00`) : new Date().toISOString();
-            let url = await uploadFile(file);
-
-            await _supabase.from('notes').insert([{ title, content, media_url: url, owner_name: currentUser, reminder_at: reminderAt, is_completed: false }]);
+            const d = document.getElementById('noteDate').value;
+            const t = document.getElementById('noteTime').value;
+            const reminderAt = d ? (t ? `${d}T${t}` : `${d}T00:00:00`) : null;
+            const url = await uploadFile(file);
+            await _supabase.from('notes').insert([{ title: document.getElementById('noteTitle').value || "Untitled", content, media_url: url, owner_name: currentUser, reminder_at: reminderAt, is_completed: false }]);
             location.reload();
         }
 
         async function fetchNotes() {
             const isHis = currentView === 'history';
-            const { data } = await _supabase.from('notes').select('*').eq('owner_name', currentUser).eq('is_completed', isHis).order('reminder_at', {ascending: false});
+            const { data } = await _supabase.from('notes').select('*').eq('owner_name', currentUser).eq('is_completed', isHis).order('created_at', {ascending: false});
             rawData = data || [];
             renderStructure(rawData);
         }
@@ -212,7 +248,8 @@
             const layout = document.getElementById('notesLayout');
             layout.innerHTML = '';
             const groups = notes.reduce((acc, n) => {
-                const day = new Date(n.reminder_at || n.created_at).toLocaleDateString('ar-EG', {weekday:'long', day:'numeric', month:'long'});
+                const displayDate = n.reminder_at ? new Date(n.reminder_at) : new Date(n.created_at);
+                const day = displayDate.toLocaleDateString('en-US', {weekday:'long', day:'numeric', month:'long'});
                 if(!acc[day]) acc[day] = [];
                 acc[day].push(n); return acc;
             }, {});
@@ -228,14 +265,14 @@
                     const media = n.media_url ? (n.media_url.match(/\.(mp4|webm|ogg)$/i) ? `<video src="${n.media_url}" class="media-box" onclick="zoom('${n.media_url}','v')"></video>` : `<img src="${n.media_url}" class="media-box" onclick="zoom('${n.media_url}','i')">`) : '';
                     card.innerHTML = `
                         <div class="card-actions">
-                            <button class="action-btn edit" onclick="openEdit('${n.id}')">✏️</button>
-                            <button class="action-btn del" onclick="deleteNote('${n.id}')">🗑️</button>
+                            <button class="action-btn" onclick="openEdit('${n.id}')">✏️</button>
+                            <button class="action-btn" onclick="askDelete('${n.id}')">🗑️</button>
                         </div>
-                        <div style="font-size:11px; opacity:0.6; margin-top:20px;">${n.reminder_at ? '⏰ ' + new Date(n.reminder_at).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'}) : ''}</div>
+                        <div style="font-size:10px; opacity:0.5; margin-top:15px;">${n.reminder_at ? new Date(n.reminder_at).toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'}) : 'New Entry'}</div>
                         <h3 style="margin:5px 0;">${n.title}</h3>
                         ${media}
-                        <p style="white-space: pre-wrap; flex-grow:1;">${n.content}</p>
-                        ${!n.is_completed ? `<button onclick="markDone('${n.id}')" style="background:var(--orange); border:none; color:white; padding:10px; border-radius:8px; cursor:pointer; font-weight:bold;">تم الإنجاز ✅</button>` : ''}
+                        <p style="white-space: pre-wrap; flex-grow:1; font-size:14px;">${n.content}</p>
+                        ${!n.is_completed ? `<button onclick="markDone('${n.id}')" style="background:var(--orange); border:none; color:white; padding:10px; border-radius:8px; cursor:pointer; font-weight:bold; width:100%; margin-top:10px;">Archive ✅</button>` : ''}
                     `;
                     row.appendChild(card);
                 });
@@ -243,63 +280,42 @@
             }
         }
 
+        function askDelete(id) {
+            document.getElementById('confirmModal').style.display = 'flex';
+            document.getElementById('finalDeleteBtn').onclick = async () => {
+                await _supabase.from('notes').delete().eq('id', id);
+                closeConfirm(); fetchNotes();
+            };
+        }
+        function closeConfirm() { document.getElementById('confirmModal').style.display = 'none'; }
+
         function openEdit(id) {
             const note = rawData.find(n => n.id === id);
-            editId = id;
-            currentMediaUrl = note.media_url;
+            editId = id; currentMediaUrl = note.media_url;
             document.getElementById('editTitle').value = note.title;
             document.getElementById('editText').value = note.content;
             document.getElementById('editDate').value = note.reminder_at ? note.reminder_at.split('T')[0] : '';
-            
             const imgDiv = document.getElementById('currentEditImg');
-            imgDiv.innerHTML = note.media_url ? 
-                `<div style="position:relative;">
-                    <img src="${note.media_url}" style="width:100px;border-radius:10px;">
-                    <button onclick="removeOldImg()" style="position:absolute;top:0;right:0;background:red;color:white;border:none;border-radius:50%;cursor:pointer;">×</button>
-                </div>` : '';
-
+            imgDiv.innerHTML = note.media_url ? `<div style="position:relative; display:inline-block;"><img src="${note.media_url}" style="width:80px;border-radius:8px;"><button onclick="removeOldImg()" style="position:absolute;top:-5px;right:-5px;background:red;color:white;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;">×</button></div>` : '';
             document.getElementById('editModal').style.display = 'flex';
         }
 
-        function removeOldImg() {
-            currentMediaUrl = null;
-            document.getElementById('currentEditImg').innerHTML = '<p style="font-size:12px;color:red;">سيتم حذف الصورة عند التحديث</p>';
-        }
+        function removeOldImg() { currentMediaUrl = null; document.getElementById('currentEditImg').innerHTML = '<p style="font-size:10px;color:red;">Media will be deleted</p>'; }
 
         async function updateNote() {
             const btn = document.getElementById('updateBtn');
-            const title = document.getElementById('editTitle').value;
-            const content = document.getElementById('editText').value;
-            const date = document.getElementById('editDate').value;
+            btn.disabled = true; btn.innerText = "Updating...";
             const file = document.getElementById('editFile').files[0];
-
-            btn.disabled = true; btn.innerText = "جاري التحديث... ⏳";
-
-            let finalUrl = currentMediaUrl;
-            if(file) {
-                finalUrl = await uploadFile(file);
-            }
-
-            await _supabase.from('notes').update({ 
-                title, content, 
-                media_url: finalUrl,
-                reminder_at: date ? `${date}T00:00:00` : null 
-            }).eq('id', editId);
-            
+            let finalUrl = file ? await uploadFile(file) : currentMediaUrl;
+            await _supabase.from('notes').update({ title: document.getElementById('editTitle').value, content: document.getElementById('editText').value, media_url: finalUrl, reminder_at: document.getElementById('editDate').value ? `${document.getElementById('editDate').value}T00:00:00` : null }).eq('id', editId);
             location.reload();
         }
 
-        async function deleteNote(id) {
-            if(confirm("مسح الملحوظة؟")) {
-                await _supabase.from('notes').delete().eq('id', id);
-                fetchNotes();
-            }
-        }
-
-        function zoom(url, type) { const lb = document.getElementById('lightbox'); lb.innerHTML = type==='v' ? `<video src="${url}" controls autoplay style="max-width:90%"></video>` : `<img src="${url}">`; lb.style.display = 'flex'; }
         async function markDone(id) { await _supabase.from('notes').update({is_completed: true}).eq('id', id); fetchNotes(); }
         function closeModal() { document.getElementById('editModal').style.display = 'none'; }
         function logout() { localStorage.clear(); location.reload(); }
+        function zoom(url, type) { const lb = document.getElementById('lightbox'); lb.innerHTML = type==='v' ? `<video src="${url}" controls autoplay style="max-width:95%; max-height:80vh;"></video>` : `<img src="${url}">`; lb.style.display = 'flex'; }
+        
         function changeView(v) { 
             currentView = v; 
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -318,7 +334,9 @@
         if(currentUser) {
             document.getElementById('auth-container').style.display = 'none';
             document.getElementById('journal-app').style.display = 'flex';
-            document.getElementById('user-display').innerText = currentUser;
+            document.getElementById('user-display').innerText = `Welcome, ${currentUser}`;
+            const firstWord = currentUser.split(' ')[0].toUpperCase();
+            document.getElementById('user-avatar-text').innerText = firstWord;
             fetchNotes();
         }
     </script>
