@@ -119,6 +119,11 @@
 
         #lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; justify-content: center; align-items: center; z-index: 100000; }
         #lightbox img, #lightbox video { max-width: 95%; max-height: 85%; border-radius: 5px; border: 2px solid white; }
+
+        /* Countdown & Alarm */
+        .countdown-timer { font-size: 11px; font-weight: bold; color: #d35400; margin-top: 4px; background: #fff0e0; padding: 2px 8px; border-radius: 4px; display: inline-block; border: 1px solid #ffcc99; }
+        @keyframes alarm-pulse { from { transform: scale(1); box-shadow: 0 0 10px var(--orange); } to { transform: scale(1.05); box-shadow: 0 0 30px var(--orange); } }
+        .alarm-active { animation: alarm-pulse 0.5s infinite alternate; }
     </style>
 </head>
 <body>
@@ -193,9 +198,15 @@
         <input type="text" id="editTitle" class="auth-input">
         <textarea id="editText" rows="5" class="auth-input"></textarea>
 
-        <div style="text-align:left; margin-bottom:10px;">
-            <label style="font-size:12px; font-weight:bold; color:var(--dark-blue)">Change Date</label>
-            <input type="date" id="editDate" class="auth-input">
+        <div style="display:flex; gap:10px; margin-bottom:10px;">
+            <div style="flex:1; text-align:left;">
+                <label style="font-size:12px; font-weight:bold; color:var(--dark-blue)">Date</label>
+                <input type="date" id="editDate" class="auth-input">
+            </div>
+            <div style="flex:1; text-align:left;">
+                <label style="font-size:12px; font-weight:bold; color:var(--dark-blue)">Time</label>
+                <input type="time" id="editTime" class="auth-input">
+            </div>
         </div>
 
         <div id="currentEditGallery" class="edit-media-preview"></div>
@@ -209,6 +220,18 @@
         <button class="auth-btn" style="background:#eee; color:#333; margin-top:10px;" onclick="closeModal()">Cancel</button>
     </div>
 </div>
+
+<!-- Modal المنبه -->
+<div id="alarmModal" class="modal">
+    <div class="modal-content alarm-active" style="border: 4px solid var(--orange);">
+        <h2 style="color: var(--orange); margin-top:0;">⏰ Time's Up!</h2>
+        <h3 id="alarmNoteTitle">Note Title</h3>
+        <p id="alarmNoteContent" style="max-height: 150px; overflow-y: auto; font-size: 14px;"></p>
+        <button class="auth-btn" style="background: var(--orange);" onclick="stopAlarm()">Stop Alarm 🔕</button>
+    </div>
+</div>
+
+<audio id="alarmAudio" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto" loop></audio>
 
 <div id="lightbox" onclick="this.style.display='none'"></div>
 
@@ -281,6 +304,7 @@
             const row = document.createElement('div'); row.className = 'journal-row';
             groups[day].forEach(n => {
                 const card = document.createElement('div'); card.className = 'note-card';
+                card.id = `note-${n.id}`;
                 // معالجة تعدد الميديا
                 const urls = n.media_url ? n.media_url.split('||') : [];
                 let galleryHtml = '';
@@ -292,12 +316,18 @@
                     });
                     galleryHtml += `</div>`;
                 }
+
+                const countdownHtml = n.reminder_at && !n.is_completed ? `<div class="countdown-timer" id="timer-${n.id}" data-time="${n.reminder_at}">Calculating...</div>` : '';
+
                 card.innerHTML = `
                     <div class="card-actions">
                         <button class="action-btn" onclick="openEdit('${n.id}')">✏️</button>
                         <button class="action-btn" onclick="askDelete('${n.id}')">🗑️</button>
                     </div>
-                    <div style="font-size:10px; opacity:0.5; margin-top:15px;">${n.reminder_at ? new Date(n.reminder_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : 'New'}</div>
+                    <div style="font-size:10px; opacity:0.5; margin-top:15px; display:flex; justify-content:space-between; align-items:center;">
+                        <span>${n.reminder_at ? new Date(n.reminder_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : 'New'}</span>
+                        ${countdownHtml}
+                    </div>
                     <h3 style="margin:5px 0;">${n.title}</h3>
                     ${galleryHtml}
                     <p style="white-space: pre-wrap; flex-grow:1; font-size:14px;">${n.content}</p>
@@ -307,6 +337,7 @@
             });
             section.appendChild(row); layout.appendChild(section);
         }
+        updateAllCountdowns();
     }
 
     function openEdit(id) {
@@ -315,7 +346,14 @@
         tempEditMedia = note.media_url ? note.media_url.split('||') : [];
         document.getElementById('editTitle').value = note.title;
         document.getElementById('editText').value = note.content;
-        document.getElementById('editDate').value = note.reminder_at ? note.reminder_at.split('T')[0] : '';
+        if(note.reminder_at) {
+            const parts = note.reminder_at.split('T');
+            document.getElementById('editDate').value = parts[0];
+            document.getElementById('editTime').value = parts[1] ? parts[1].slice(0,5) : '';
+        } else {
+            document.getElementById('editDate').value = '';
+            document.getElementById('editTime').value = '';
+        }
         renderEditGallery();
         document.getElementById('editModal').style.display = 'block';
     }
@@ -345,14 +383,65 @@
     async function updateNote() {
         const btn = document.getElementById('updateBtn'); btn.disabled = true; btn.innerText = "Saving...";
         const finalMediaStr = tempEditMedia.join('||');
+        const d = document.getElementById('editDate').value, t = document.getElementById('editTime').value;
+        const reminder = d ? (t ? `${d}T${t}` : `${d}T00:00:00`) : null;
+
         await _supabase.from('notes').update({
             title: document.getElementById('editTitle').value,
             content: document.getElementById('editText').value,
             media_url: finalMediaStr,
-            reminder_at: document.getElementById('editDate').value ? `${document.getElementById('editDate').value}T00:00:00` : null
+            reminder_at: reminder
         }).eq('id', editId);
         location.reload();
     }
+
+    // --- Countdown & Alarm Logic ---
+    let activeAlarms = new Set();
+
+    function updateAllCountdowns() {
+        document.querySelectorAll('.countdown-timer').forEach(el => {
+            const target = new Date(el.dataset.time).getTime();
+            const now = new Date().getTime();
+            const diff = target - now;
+
+            if (diff <= 0) {
+                el.innerText = "Due!";
+                el.style.color = "red";
+                // Trigger Alarm
+                const noteId = el.id.replace('timer-', '');
+                triggerAlarm(noteId);
+            } else {
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const secs = Math.floor((diff % (1000 * 60)) / 1000);
+                el.innerText = `${hours}h ${mins}m ${secs}s`;
+            }
+        });
+    }
+
+    function triggerAlarm(id) {
+        if (activeAlarms.has(id)) return;
+        const note = rawData.find(n => n.id == id);
+        if (!note || note.is_completed) return;
+
+        activeAlarms.add(id);
+        document.getElementById('alarmNoteTitle').innerText = note.title;
+        document.getElementById('alarmNoteContent').innerText = note.content;
+        document.getElementById('alarmModal').style.display = 'block';
+        const audio = document.getElementById('alarmAudio');
+        audio.play().catch(e => console.log("Audio play blocked"));
+    }
+
+    function stopAlarm() {
+        document.getElementById('alarmModal').style.display = 'none';
+        const audio = document.getElementById('alarmAudio');
+        audio.pause();
+        audio.currentTime = 0;
+        // Optional: mark as done or just clear from active set
+        // activeAlarms.clear();
+    }
+
+    setInterval(updateAllCountdowns, 1000);
 
     function askDelete(id) { document.getElementById('confirmModal').style.display = 'block'; document.getElementById('finalDeleteBtn').onclick = async () => { await _supabase.from('notes').delete().eq('id', id); location.reload(); }; }
     function closeConfirm() { document.getElementById('confirmModal').style.display = 'none'; }
