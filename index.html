@@ -10,6 +10,8 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         :root { --dark-blue: #001f3f; --orange: #ff851b; --white: #ffffff; --paper: #fdfcf0; --book-spine: #00152b; --glass: rgba(255, 255, 255, 0.1); }
         body { background-color: var(--dark-blue); margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: var(--white); overflow-x: hidden; direction: ltr; }
+
+        /* Auth Styles */
         #auth-container { margin-top: 5vh; background: var(--white); padding: 30px; border-radius: 20px; box-shadow: 10px 10px 0px var(--orange); width: 85%; max-width: 380px; color: #333; text-align: center; border: 3px solid var(--book-spine); }
         .auth-tabs { display: flex; margin-bottom: 20px; background: #eee; border-radius: 50px; padding: 4px; }
         .auth-tab { flex: 1; padding: 10px; cursor: pointer; border-radius: 50px; font-weight: bold; font-size: 14px; }
@@ -17,21 +19,27 @@
         .auth-input { width: 100%; padding: 14px; margin-bottom: 12px; border: 2px solid #ddd; border-radius: 12px; outline: none; font-size: 16px; display: block; }
         .auth-btn { background: var(--dark-blue); color: white; border: none; width: 100%; padding: 14px; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s; }
         .auth-btn:disabled { opacity: 0.6; cursor: not-allowed; background: #555; }
+
+        /* App Layout */
         #journal-app { display: none; width: 100%; flex-direction: column; align-items: center; }
         .top-bar { width: 92%; display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
         .avatar-word { font-weight: bold; font-size: 24px; text-transform: uppercase; display: flex; align-items: center; gap: 4px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); padding: 5px; }
         .animated-letter { display: inline-block; animation: dropBounce 2s infinite ease-in; position: relative; }
         @keyframes dropBounce { 0% { transform: translateY(-60px); opacity: 0; } 30% { transform: translateY(0); opacity: 1; } 50% { transform: translateY(-25px); } 70% { transform: translateY(0); } 85% { transform: translateY(-10px); } 100% { transform: translateY(0); } }
+
         .search-box { width: 90%; max-width: 600px; padding: 12px 20px; border-radius: 50px; border: 2px solid var(--orange); background: var(--glass); color: white; margin: 15px 0; outline: none; }
-        .nav-tabs { margin-bottom: 20px; display: flex; gap: 10px; }
-        .tab-btn { background: transparent; border: 2px solid var(--orange); color: white; padding: 8px 25px; border-radius: 50px; cursor: pointer; font-size: 14px; }
+        .nav-tabs { margin-bottom: 20px; display: flex; gap: 10px; overflow-x: auto; padding: 5px; width: 95%; justify-content: center; }
+        .tab-btn { background: transparent; border: 2px solid var(--orange); color: white; padding: 8px 20px; border-radius: 50px; cursor: pointer; font-size: 13px; white-space: nowrap; flex-shrink: 0; }
         .tab-btn.active { background: var(--orange); box-shadow: 0 0 10px var(--orange); }
+
+        /* Notes Section */
+        #notes-section { width: 100%; display: flex; flex-direction: column; align-items: center; }
         .glass-input { background: var(--white); padding: 20px; border-radius: 20px; width: 90%; max-width: 600px; box-shadow: 10px 10px 0px var(--orange); border: 3px solid var(--book-spine); color: #333; margin-bottom: 30px; }
         .glass-input input, .glass-input textarea { width: 100%; border: 1px solid #eee; border-radius: 10px; padding: 12px; margin-bottom: 10px; font-size: 16px; }
         .datetime-row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
         .datetime-row div { flex: 1; }
-        .today-btn { background: var(--orange); color: white; border: none; padding: 10px; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 12px; }
         .file-upload-art { border: 2px dashed var(--orange); background: #fffbf5; padding: 15px; border-radius: 10px; text-align: center; cursor: pointer; margin-bottom: 10px; font-size: 14px; color: #666; }
+
         .day-header { background: var(--orange); color: white; padding: 8px 25px; border-radius: 0 30px 30px 0; margin: 15px 0; font-weight: bold; align-self: flex-end; margin-right: 5%; }
         .journal-row { display: flex; gap: 20px; padding: 15px 20px 35px 20px; overflow-x: auto; width: 100%; scroll-snap-type: x mandatory; direction: rtl; }
         .note-card { min-width: 290px; max-width: 290px; background: var(--paper); color: #333; padding: 20px; border-radius: 5px 20px 20px 5px; box-shadow: 5px 5px 15px rgba(0,0,0,0.3); border-right: 12px solid var(--book-spine); scroll-snap-align: center; display: flex; flex-direction: column; position: relative; direction: ltr; }
@@ -40,8 +48,43 @@
         .stop-alarm-small { background: #ff4444 !important; color: white !important; display: none; animation: pulse-red 1s infinite; }
         .stop-alarm-small.stopped { background: #2ecc71 !important; animation: none; transform: scale(0.9); }
         @keyframes pulse-red { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
         .media-gallery { display: flex; gap: 10px; overflow-x: auto; margin: 12px 0; scroll-snap-type: x mandatory; padding-bottom: 5px; }
         .gallery-item { flex: 0 0 85%; height: 180px; border-radius: 12px; object-fit: cover; scroll-snap-align: start; background: #eee; border: 1px solid #ddd; }
+
+        /* Azkar Section */
+        #azkar-section { width: 100%; display: none; flex-direction: column; align-items: center; padding-bottom: 120px; }
+        .azkar-grid { display: flex; flex-direction: column; gap: 12px; width: 92%; margin-top: 15px; }
+        .azkar-card { background: var(--white); border-radius: 15px; padding: 15px; text-align: right; box-shadow: 4px 4px 0px var(--orange); border: 2px solid var(--book-spine); color: #333; display: flex; align-items: center; justify-content: space-between; transition: 0.2s; position: relative; cursor: pointer; }
+        .azkar-card.selected { border: 3px solid var(--orange); background: #fff9f0; transform: scale(1.02); }
+        .azkar-card.focus-card { animation: focusIn 0.4s ease-out; }
+        @keyframes focusIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        .azkar-text { font-size: 18px; font-weight: bold; color: var(--dark-blue); flex: 1; direction: rtl; padding-right: 10px; }
+        .azkar-counter { font-size: 24px; font-weight: 900; color: var(--orange); font-family: monospace; min-width: 60px; text-align: left; }
+        .azkar-reset {
+            width: 50px; height: 50px; background: #fdfcf0; border: 2px solid var(--book-spine); border-radius: 50%;
+            cursor: pointer; position: relative; box-shadow: 0 6px 0 var(--book-spine), 0 8px 15px rgba(0,0,0,0.3);
+            transition: 0.1s; display: flex; align-items: center; justify-content: center; margin-right: 10px; outline: none;
+        }
+        .azkar-reset:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--book-spine); }
+        .azkar-reset::after { content: '↺'; font-size: 28px; font-weight: bold; color: var(--dark-blue); }
+        .azkar-reset::before { content: 'RESET'; position: absolute; top: -15px; font-size: 9px; font-weight: bold; color: var(--orange); letter-spacing: 1px; text-shadow: 1px 1px 0 #fff; }
+        .add-zikr-container { background: var(--glass); border: 2px dashed var(--orange); border-radius: 20px; padding: 15px; width: 92%; margin-top: 15px; display: flex; gap: 10px; }
+
+        /* Fingerprint Button - Professional Dark Blue Theme */
+        #fingerprint-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 120px; height: 120px; display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .fingerprint-btn {
+            width: 100px; height: 100px; background: var(--dark-blue); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            transition: 0.1s; position: relative; z-index: 2; border: 5px solid var(--white);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6), 0 0 20px rgba(255,255,255,0.3);
+        }
+        .fingerprint-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.2); }
+        .fingerprint-btn svg { width: 60px; height: 60px; fill: #ffffff; filter: drop-shadow(0 0 5px rgba(255,255,255,0.8)); }
+        .pulse-ring { position: absolute; width: 90px; height: 90px; border: 2px solid white; border-radius: 50%; animation: pulse-ring-anim 2s infinite; z-index: 1; pointer-events: none; }
+        @keyframes pulse-ring-anim { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.8); opacity: 0; } }
+
+        /* Modals & Others */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); display: none; z-index: 99999; overflow-y: auto; padding: 40px 0; -webkit-overflow-scrolling: touch; }
         .modal-content { background: white; padding: 25px; border-radius: 20px; width: 90%; max-width: 420px; margin: 0 auto; color: #333; box-shadow: 0 15px 50px rgba(0,0,0,0.8); position: relative; text-align: center; }
         .alert-btns { display: flex; gap: 10px; margin-top: 20px; }
@@ -77,91 +120,72 @@
         <div class="user-profile"><div class="avatar-word" id="user-avatar-text">NAME</div></div>
         <button class="auth-btn" style="padding:6px 15px; font-size:12px; width:auto;" onclick="logout()">Logout</button>
     </div>
-    <input type="text" id="fuzzySearch" class="search-box" placeholder="Search notes...">
-    <div class="nav-tabs">
-        <button id="tabActive" class="tab-btn active" onclick="changeView('active')">My Notes</button>
-        <button id="tabHistory" class="tab-btn" onclick="changeView('history')">Archive</button>
-    </div>
-    <div class="glass-input" id="entryForm">
-        <input type="text" id="noteTitle" placeholder="Note Title">
-        <textarea id="noteText" rows="3" placeholder="What's on your mind?"></textarea>
-        <div class="datetime-row">
-            <div><label style="font-size:10px;">Date</label><input type="date" id="noteDate"></div>
-            <div><label style="font-size:10px;">Time</label><input type="time" id="noteTime"></div>
-            <button class="auth-btn" style="width:auto; padding:5px 15px;" onclick="setToday()">Today</button>
+
+    <div id="main-view-container" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+        <input type="text" id="fuzzySearch" class="search-box" placeholder="Search notes...">
+        <div class="nav-tabs">
+            <button id="tabActive" class="tab-btn active" onclick="changeView('active')">My Notes</button>
+            <button id="tabHistory" class="tab-btn" onclick="changeView('history')">Archive</button>
+            <button id="tabAzkar" class="tab-btn" onclick="changeView('azkar')">Azkar ✨</button>
         </div>
-        <div class="file-upload-art" onclick="document.getElementById('noteFile').click()">
-            <span id="fileLabel">Attach Media 🖼️</span>
-            <input type="file" id="noteFile" hidden onchange="document.getElementById('fileLabel').innerText='Media Ready ✅'">
+
+        <!-- Notes Section -->
+        <div id="notes-section">
+            <div class="glass-input" id="entryForm">
+                <input type="text" id="noteTitle" placeholder="Note Title">
+                <textarea id="noteText" rows="3" placeholder="What's on your mind?"></textarea>
+                <div class="datetime-row">
+                    <div><label style="font-size:10px;">Date</label><input type="date" id="noteDate"></div>
+                    <div><label style="font-size:10px;">Time</label><input type="time" id="noteTime"></div>
+                    <button class="auth-btn" style="width:auto; padding:5px 15px;" onclick="setToday()">Today</button>
+                </div>
+                <div class="file-upload-art" onclick="document.getElementById('noteFile').click()">
+                    <span id="fileLabel">Attach Media 🖼️</span>
+                    <input type="file" id="noteFile" hidden onchange="document.getElementById('fileLabel').innerText='Media Ready ✅'">
+                </div>
+                <button id="mainSaveBtn" class="auth-btn" onclick="handleSave()">Save Now ✨</button>
+            </div>
+            <div id="notesLayout" style="width: 100%;"></div>
         </div>
-        <button id="mainSaveBtn" class="auth-btn" onclick="handleSave()">Save Now ✨</button>
-    </div>
-    <div id="notesLayout" style="width: 100%;"></div>
-</div>
 
-<!-- Modal الحذف -->
-<div id="confirmModal" class="modal">
-    <div class="modal-content">
-        <h3 style="color: var(--dark-blue); margin-top:0;">Are you sure? 🗑️</h3>
-        <p>This entry will be permanently deleted.</p>
-        <div class="alert-btns">
-            <button class="alert-btn" style="background: #eee;" onclick="closeConfirm()">Cancel</button>
-            <button id="finalDeleteBtn" class="alert-btn" style="background: #ff4444; color: white;">Delete</button>
+        <!-- Azkar Section -->
+        <div id="azkar-section">
+            <div class="add-zikr-container">
+                <input type="text" id="newZikrInput" class="auth-input" placeholder="أضف ذكراً جديداً..." style="margin-bottom:0; direction: rtl;">
+                <button class="auth-btn" style="width: 80px;" onclick="addNewZikr()">إضافة</button>
+            </div>
+            <div class="azkar-grid" id="azkarGrid"></div>
         </div>
     </div>
 </div>
 
-<!-- Modal التعديل -->
-<div id="editModal" class="modal">
-    <div class="modal-content">
-        <h3 style="margin-top:0;">Edit Entry ✏️</h3>
-        <input type="text" id="editTitle" class="auth-input">
-        <textarea id="editText" rows="5" class="auth-input"></textarea>
-        <div style="display:flex; gap:10px; margin-bottom:10px;"><div style="flex:1; text-align:left;"><label style="font-size:12px; font-weight:bold; color:var(--dark-blue)">Date</label><input type="date" id="editDate" class="auth-input"></div><div style="flex:1; text-align:left;"><label style="font-size:12px; font-weight:bold; color:var(--dark-blue)">Time</label><input type="time" id="editTime" class="auth-input"></div></div>
-        <div id="currentEditGallery" class="edit-media-preview"></div>
-        <div class="file-upload-art" onclick="document.getElementById('editFile').click()"><span id="editFileLabel">Add New Media ➕</span><input type="file" id="editFile" hidden onchange="handleNewEditFile()"></div>
-        <button id="updateBtn" class="auth-btn" onclick="updateNote()">Save Changes</button>
-        <button class="auth-btn" style="background:#eee; color:#333; margin-top:10px;" onclick="closeModal()">Cancel</button>
+<!-- Fingerprint Floating Button -->
+<div id="fingerprint-container">
+    <div class="pulse-ring"></div>
+    <div class="fingerprint-btn" onclick="incrementSelectedZikr()">
+        <svg viewBox="0 0 24 24"><path d="M17.81 4.47c-.08 0-.16-.02-.23-.06C15.66 3.42 14 3 12.01 3c-1.98 0-3.86.47-5.57 1.41-.24.13-.54.04-.67-.2s-.04-.54.2-.67C7.86 2.51 9.89 2 12.01 2c2.14 0 3.96.46 5.8 1.48.24.13.33.43.2.67-.07.14-.21.22-.36.22h-.04zM4.03 9.75c-.15 0-.3-.07-.38-.2-.11-.25.01-.54.26-.65C5.93 8.04 8.05 7.5 10.32 7.3c2.31-.21 4.7.12 7.1.99.26.09.4.38.3.64s-.38.4-.64.3c-2.22-.81-4.43-1.1-6.6-.9-2.12.19-4.1.7-5.74 1.41-.03.01-.07.01-.11.01zm11.23 11.45c-.06 0-.12-.01-.18-.03-.25-.09-.38-.38-.29-.63.63-1.74.95-3.61.95-5.54 0-2.31-.47-4.52-1.39-6.56-.1-.24.01-.52.26-.63.24-.1.52.01.63.26.96 2.12 1.45 4.43 1.45 6.84 0 2.01-.33 3.96-.99 5.8-.08.19-.27.29-.48.29zm-10.74-5.33c-.22 0-.42-.15-.48-.38-.07-.26.09-.53.35-.6 2.39-.62 4.48-.63 6.6-.02.26.07.41.34.34.6s-.34.41-.6.34c-1.9-.55-3.8-.54-5.94.01-.09.02-.18.05-.27.05zm10.27 4.14c-.11 0-.21-.04-.3-.11-.2-.17-.23-.48-.06-.68.61-.71.95-1.57.95-2.52 0-1.88-1.53-3.41-3.41-3.41s-3.41 1.53-3.41 3.41c0 .28.22.5.5.5s.5-.22.5-.5c0-1.33 1.08-2.41 2.41-2.41s2.41 1.08 2.41 2.41c0 .73-.26 1.4-.73 1.95-.17.21-.14.51.07.68.08.05.18.08.27.08zm-5.46.22c-.28 0-.5-.22-.5-.5v-4.12c0-.28.22-.5.5-.5s.5.22.5.5v4.12c0 .28-.22.5-.5.5zm1.56 3.7c-.12 0-.24-.04-.33-.13-.2-.19-.2-.51-.01-.71 1.15-1.18 1.79-2.73 1.79-4.36 0-3.32-2.7-6.02-6.02-6.02s-6.02 2.7-6.02 6.02c0 1.25.39 2.46 1.13 3.5.16.22.1.53-.12.69s-.53.1-.69-.12c-.84-1.18-1.3-2.57-1.3-4.02 0-3.87 3.15-7.02 7.02-7.02s7.02 3.15 7.02 7.02c0 1.9-.74 3.71-2.08 5.1-.1.11-.24.16-.39.16z"/></svg>
     </div>
 </div>
 
-<!-- Modal المنبه -->
-<div id="alarmModal" class="modal">
-    <div class="modal-content alarm-active" style="border: 4px solid var(--orange);">
-        <h2 style="color: var(--orange); margin-top:0;">⏰ Time's Up!</h2>
-        <h3 id="alarmNoteTitle">Note Title</h3>
-        <p id="alarmNoteContent" style="max-height: 150px; overflow-y: auto; font-size: 14px;"></p>
-        <button id="stopAlarmBtn" class="auth-btn" style="background: var(--orange);" onclick="stopAlarmUI(event)">Stop Alarm ✅</button>
-    </div>
-</div>
-
-<audio id="alarmAudio" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto" loop></audio>
+<!-- Modals -->
+<div id="confirmModal" class="modal"><div class="modal-content"><h3>Are you sure? 🗑️</h3><p>This entry will be permanently deleted.</p><div class="alert-btns"><button class="alert-btn" style="background: #eee;" onclick="closeConfirm()">Cancel</button><button id="finalDeleteBtn" class="alert-btn" style="background: #ff4444; color: white;">Delete</button></div></div></div>
+<div id="editModal" class="modal"><div class="modal-content"><h3>Edit Entry ✏️</h3><input type="text" id="editTitle" class="auth-input"><textarea id="editText" rows="5" class="auth-input"></textarea><div style="display:flex; gap:10px; margin-bottom:10px;"><div style="flex:1; text-align:left;"><label style="font-size:12px; font-weight:bold; color:var(--dark-blue)">Date</label><input type="date" id="editDate" class="auth-input"></div><div style="flex:1; text-align:left;"><label style="font-size:12px; font-weight:bold; color:var(--dark-blue)">Time</label><input type="time" id="editTime" class="auth-input"></div></div><div id="currentEditGallery" class="edit-media-preview"></div><div class="file-upload-art" onclick="document.getElementById('editFile').click()"><span id="editFileLabel">Add Media ➕</span><input type="file" id="editFile" hidden onchange="handleNewEditFile()"></div><button id="updateBtn" class="auth-btn" onclick="updateNote()">Save Changes</button><button class="auth-btn" style="background:#eee; color:#333; margin-top:10px;" onclick="closeModal()">Cancel</button></div></div>
+<div id="alarmModal" class="modal"><div class="modal-content alarm-active" style="border: 4px solid var(--orange);"><h2 style="color: var(--orange);">⏰ Time's Up!</h2><h3 id="alarmNoteTitle">Note</h3><p id="alarmNoteContent" style="max-height: 150px; overflow-y: auto;"></p><button class="auth-btn" style="background: var(--orange);" onclick="stopAlarmUI(event)">Stop Alarm ✅</button></div></div>
 <div id="lightbox" onclick="this.style.display='none'"></div>
 
 <script>
     const SB_URL = "https://ixzuotmqgdnlrkalwyyg.supabase.co", SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4enVvdG1xZ2RubHJrYWx3eXlnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1NDAwMTQsImV4cCI6MjA5MTExNjAxNH0.NrU4rKVfrHWB0x220iIGzr-aXGm_5EljV4CCoYFnojo";
     const _supabase = supabase.createClient(SB_URL, SB_KEY);
-    let currentView = 'active', rawData = [], currentUser = localStorage.getItem('mo_user'), isAlarmActive = false, editingId = null, currentAlarmingNoteId = null, tempEditMedia = [], autoplayHandler = null;
+    let currentView = 'active', rawData = [], currentUser = localStorage.getItem('mo_user'), isAlarmActive = false, editingId = null, currentAlarmingNoteId = null, tempEditMedia = [];
+    let azkarList = [], selectedZikrId = null, isAzkarFocusMode = false;
 
-    function setToday() { const n = new Date(); document.getElementById('noteDate').value = n.toISOString().split('T')[0]; document.getElementById('noteTime').value = n.toTimeString().slice(0,5); }
+    // --- Auth ---
     function setMode(m) { document.getElementById('tab-login').classList.toggle('active', m==='login'); document.getElementById('tab-register').classList.toggle('active', m==='register'); window.authMode = m; }
     async function handleAuth() { const u = document.getElementById('auth-user').value, p = document.getElementById('auth-pass').value; if(window.authMode === 'register') { await _supabase.from('journal_users').insert([{ username: u, password: p }]); location.reload(); } else { const { data } = await _supabase.from('journal_users').select('*').eq('username', u).eq('password', p).single(); if(data) { localStorage.setItem('mo_user', u); location.reload(); } } }
-    async function uploadFile(file) { if(!file) return null; const name = `${Date.now()}_${file.name}`; await _supabase.storage.from('media').upload(name, file); return _supabase.storage.from('media').getPublicUrl(name).data.publicUrl; }
+    function logout() { localStorage.clear(); location.reload(); }
 
-    async function handleSave() {
-        const titleInput = document.getElementById('noteTitle'), contentInput = document.getElementById('noteText'), saveBtn = document.getElementById('mainSaveBtn');
-        if(!contentInput.value.trim()) return; saveBtn.disabled = true; saveBtn.innerText = "Saving... ⏳";
-        try {
-            const d = document.getElementById('noteDate').value, t = document.getElementById('noteTime').value, reminder = d ? (new Date(`${d}T${t || '00:00'}`)) : null;
-            if(reminder && typeof Android !== 'undefined') Android.scheduleAlarm(titleInput.value || "Untitled", contentInput.value.substring(0,50), reminder.getTime());
-            const file = document.getElementById('noteFile').files[0], url = await uploadFile(file);
-            await _supabase.from('notes').insert([{ title: titleInput.value || "Untitled", content: contentInput.value, media_url: url, owner_name: currentUser, reminder_at: reminder ? reminder.toISOString() : null, is_completed: false, alarm_stopped: false }]);
-            location.reload();
-        } catch(err) { alert("Save failed: " + err.message); saveBtn.disabled = false; saveBtn.innerText = "Save Now ✨"; }
-    }
-
+    // --- Notes ---
     async function fetchNotes() { const { data } = await _supabase.from('notes').select('*').eq('owner_name', currentUser).eq('is_completed', currentView === 'history').order('created_at', {ascending: false}); rawData = data || []; renderStructure(rawData); }
-
     function renderStructure(notes) {
         const layout = document.getElementById('notesLayout'); layout.innerHTML = '';
         const groups = notes.reduce((acc, n) => { const d = n.reminder_at ? new Date(n.reminder_at) : new Date(n.created_at); const day = d.toLocaleDateString('en-US', {weekday:'long', day:'numeric', month:'long'}); if(!acc[day]) acc[day] = []; acc[day].push(n); return acc; }, {});
@@ -173,87 +197,161 @@
                 const urls = n.media_url ? n.media_url.split('||') : [];
                 let galleryHtml = urls.length > 0 ? `<div class="media-gallery">` + urls.map(u => u.match(/\.(mp4|webm|ogg)$/i) ? `<video src="${u}" class="gallery-item" onclick="zoom('${u}','v')"></video>` : `<img src="${u}" class="gallery-item" onclick="zoom('${u}','i')">`).join('') + `</div>` : '';
                 const countdownHtml = n.reminder_at && !n.is_completed && !n.alarm_stopped ? `<div class="countdown-timer" id="timer-${n.id}" data-time="${n.reminder_at}">...</div>` : '';
-                card.innerHTML = `<div class="card-actions"><button class="action-btn" onclick="openEdit('${n.id}')">✏️</button><button class="action-btn" onclick="askDelete('${n.id}')">🗑️</button><button class="action-btn stop-alarm-small" id="stop-btn-${n.id}" onclick="stopAlarmUI(event, '${n.id}')">🔕</button></div><div style="font-size:10px; opacity:0.5; margin-top:15px; display:flex; justify-content:space-between; align-items:center;"><span>${n.reminder_at ? new Date(n.reminder_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : ''}</span>${countdownHtml}</div><h3 style="margin:5px 0;">${n.title}</h3>${galleryHtml}<p style="white-space: pre-wrap; flex-grow:1; font-size:14px;">${n.content}</p>${!n.is_completed ? `<button onclick="markDone('${n.id}', this)" style="background:var(--orange); border:none; color:white; padding:12px; border-radius:8px; width:100%; margin-top:10px; font-weight:bold; display:flex; align-items:center; justify-content:center; transition:0.3s;">Archive ✅</button>` : ''}`;
+                card.innerHTML = `<div class="card-actions"><button class="action-btn" onclick="openEdit('${n.id}')">✏️</button><button class="action-btn" onclick="askDelete('${n.id}')">🗑️</button><button class="action-btn stop-alarm-small" id="stop-btn-${n.id}" onclick="stopAlarmUI(event, '${n.id}')">🔕</button></div><div style="font-size:10px; opacity:0.5; margin-top:15px; display:flex; justify-content:space-between; align-items:center;"><span>${n.reminder_at ? new Date(n.reminder_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : ''}</span>${countdownHtml}</div><h3 style="margin:5px 0;">${n.title}</h3>${galleryHtml}<p style="white-space: pre-wrap; flex-grow:1; font-size:14px;">${n.content}</p>${!n.is_completed ? `<button onclick="markDone('${n.id}', this)" style="background:var(--orange); border:none; color:white; padding:12px; border-radius:8px; width:100%; margin-top:10px; font-weight:bold; display:flex; align-items:center; justify-content:center;">Archive ✅</button>` : ''}`;
                 row.appendChild(card);
             });
             section.appendChild(row); layout.appendChild(section);
         }
         updateAllCountdowns();
     }
+    async function handleSave() {
+        const titleInput = document.getElementById('noteTitle'), contentInput = document.getElementById('noteText'), saveBtn = document.getElementById('mainSaveBtn');
+        if(!contentInput.value.trim()) return; saveBtn.disabled = true; saveBtn.innerText = "Saving... ⏳";
+        try {
+            const d = document.getElementById('noteDate').value, t = document.getElementById('noteTime').value, reminder = d ? (new Date(`${d}T${t || '00:00'}`)) : null;
+            if(reminder && typeof Android !== 'undefined') Android.scheduleAlarm(titleInput.value || "Untitled", contentInput.value.substring(0,50), reminder.getTime());
+            const file = document.getElementById('noteFile').files[0], url = await uploadFile(file);
+            await _supabase.from('notes').insert([{ title: titleInput.value || "Untitled", content: contentInput.value, media_url: url, owner_name: currentUser, reminder_at: reminder ? reminder.toISOString() : null, is_completed: false, alarm_stopped: false }]);
+            location.reload();
+        } catch(err) { alert("Save failed: " + err.message); saveBtn.disabled = false; saveBtn.innerText = "Save Now ✨"; }
+    }
+    async function uploadFile(file) { if(!file) return null; const name = `${Date.now()}_${file.name}`; await _supabase.storage.from('media').upload(name, file); return _supabase.storage.from('media').getPublicUrl(name).data.publicUrl; }
+    function setToday() { const n = new Date(); document.getElementById('noteDate').value = n.toISOString().split('T')[0]; document.getElementById('noteTime').value = n.toTimeString().slice(0,5); }
 
+    // --- Azkar ---
+    async function fetchAzkar() {
+        const { data } = await _supabase.from('azkar').select('*').eq('owner_name', currentUser).order('created_at', {ascending: true});
+        if (data && data.length > 0) { azkarList = data; }
+        else {
+            const defaults = ["سبحان الله", "الحمد لله", "لا إله إلا الله", "الله أكبر", "أستغفر الله", "اللهم صل على محمد"];
+            const toInsert = defaults.map(t => ({ text: t, count: 0, owner_name: currentUser }));
+            const { data: inserted } = await _supabase.from('azkar').insert(toInsert).select();
+            azkarList = inserted || [];
+        }
+        if (azkarList.length > 0 && selectedZikrId === null) selectedZikrId = azkarList[0].id;
+        renderAzkar();
+    }
+    function renderAzkar() {
+        const grid = document.getElementById('azkarGrid'); grid.innerHTML = '';
+        const addContainer = document.querySelector('.add-zikr-container');
+        const fingerprint = document.getElementById('fingerprint-container');
+
+        if (isAzkarFocusMode && selectedZikrId) {
+            addContainer.style.display = 'none';
+            fingerprint.style.display = 'flex';
+            const zikr = azkarList.find(z => z.id === selectedZikrId);
+            if (zikr) {
+                const backBtn = document.createElement('button');
+                backBtn.className = 'auth-btn';
+                backBtn.style = 'width: 100%; margin-bottom: 20px; background: rgba(0,0,0,0.3); border: 2px solid var(--orange); height: 50px; font-size: 18px;';
+                backBtn.innerHTML = '⬅ العودة لكل الأذكار';
+                backBtn.onclick = () => { isAzkarFocusMode = false; renderAzkar(); };
+                grid.appendChild(backBtn);
+
+                const card = document.createElement('div');
+                card.className = `azkar-card selected focus-card`;
+                card.style.cssText = 'flex-direction: column; height: auto; min-height: 400px; padding: 50px 20px; border-radius: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.4);';
+                card.innerHTML = `
+                    <div class="azkar-text" style="font-size: 38px; text-align:center; padding:0; width:100%; color:var(--dark-blue); line-height: 1.4;">${zikr.text}</div>
+                    <div style="display:flex; flex-direction:column; align-items:center; gap:35px; margin-top:40px; width:100%;">
+                        <div class="azkar-counter" id="zikr-count-${zikr.id}" style="font-size: 100px; text-align:center; width:100%; color: var(--orange); font-family: 'Courier New', monospace; text-shadow: 3px 3px 0px var(--book-spine);">${zikr.count}</div>
+                        <button class="azkar-reset" onclick="event.stopPropagation(); resetZikr('${zikr.id}')" style="margin-right:0; width:70px; height:70px;"></button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            }
+        } else {
+            addContainer.style.display = 'flex';
+            fingerprint.style.display = 'none';
+            azkarList.forEach(zikr => {
+                const card = document.createElement('div');
+                card.className = `azkar-card ${zikr.id === selectedZikrId ? 'selected' : ''}`;
+                card.onclick = () => { selectedZikrId = zikr.id; isAzkarFocusMode = true; renderAzkar(); };
+                card.innerHTML = `
+                    <div style="display:flex; align-items:center;">
+                        <button class="azkar-reset" onclick="event.stopPropagation(); resetZikr('${zikr.id}')" style="width:35px; height:35px; box-shadow: 0 3px 0 var(--book-spine);"></button>
+                        <div class="azkar-counter" id="zikr-count-${zikr.id}">${zikr.count}</div>
+                    </div>
+                    <div class="azkar-text">${zikr.text}</div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+    }
+    function incrementSelectedZikr() {
+        if (!selectedZikrId) return;
+        const zikr = azkarList.find(z => z.id === selectedZikrId);
+        if (zikr) {
+            zikr.count++;
+            document.getElementById(`zikr-count-${zikr.id}`).innerText = zikr.count;
+            if (navigator.vibrate) navigator.vibrate(40);
+            _supabase.from('azkar').update({ count: zikr.count }).eq('id', zikr.id).then();
+        }
+    }
+    async function resetZikr(id) {
+        const zikr = azkarList.find(z => z.id === id);
+        if (zikr) { zikr.count = 0; document.getElementById(`zikr-count-${id}`).innerText = 0; await _supabase.from('azkar').update({ count: 0 }).eq('id', id); }
+    }
+    async function addNewZikr() {
+        const input = document.getElementById('newZikrInput'), text = input.value.trim();
+        if (text) {
+            const { data } = await _supabase.from('azkar').insert([{ text: text, count: 0, owner_name: currentUser }]).select();
+            if (data) { azkarList.push(data[0]); selectedZikrId = data[0].id; input.value = ''; renderAzkar(); }
+        }
+    }
+
+    // --- View ---
+    function changeView(v) {
+        currentView = v;
+        isAzkarFocusMode = false;
+        document.getElementById('tabActive').classList.toggle('active', v === 'active');
+        document.getElementById('tabHistory').classList.toggle('active', v === 'history');
+        document.getElementById('tabAzkar').classList.toggle('active', v === 'azkar');
+        document.getElementById('notes-section').style.display = v === 'azkar' ? 'none' : 'flex';
+        document.getElementById('fuzzySearch').style.display = v === 'azkar' ? 'none' : 'block';
+        document.getElementById('azkar-section').style.display = v === 'azkar' ? 'flex' : 'none';
+
+        // Let renderAzkar handle fingerprint visibility
+        document.getElementById('fingerprint-container').style.display = 'none';
+
+        if (v === 'azkar') fetchAzkar(); else fetchNotes();
+    }
+
+    // --- Alarms ---
     function updateAllCountdowns() {
-        if(editingId) return;
+        if(editingId || currentView === 'azkar') return;
         document.querySelectorAll('.countdown-timer').forEach(el => {
             const target = new Date(el.dataset.time).getTime(), now = new Date().getTime(), diff = target - now, noteId = el.id.replace('timer-', ''), smallStopBtn = document.getElementById(`stop-btn-${noteId}`);
-            if (diff <= 0) { el.innerText = "Due!"; el.style.color = "red"; if(smallStopBtn && !smallStopBtn.classList.contains('stopped')) smallStopBtn.style.display = 'flex'; if (diff > -60000 && !isAlarmActive) triggerAlarm(noteId); }
-            else { if(smallStopBtn) smallStopBtn.style.display = 'none'; el.innerText = `${Math.floor(diff/3600000)}h ${Math.floor((diff%3600000)/60000)}m ${Math.floor((diff%60000)/1000)}s`; }
+            if (diff <= 0) { el.innerText = "Due!"; if(smallStopBtn && !smallStopBtn.classList.contains('stopped')) smallStopBtn.style.display = 'flex'; if (diff > -60000 && !isAlarmActive) triggerAlarm(noteId); }
+            else { el.innerText = `${Math.floor(diff/3600000)}h ${Math.floor((diff%3600000)/60000)}m ${Math.floor((diff%60000)/1000)}s`; }
         });
     }
-
     function triggerAlarm(id) {
-        const note = rawData.find(n => n.id == id);
-        if (!note || note.is_completed || note.alarm_stopped || isAlarmActive || editingId) return;
+        const note = rawData.find(n => n.id == id); if (!note || note.is_completed || note.alarm_stopped || isAlarmActive || editingId) return;
         isAlarmActive = true; currentAlarmingNoteId = id;
-        document.getElementById('alarmNoteTitle').innerText = note.title;
-        document.getElementById('alarmNoteContent').innerText = note.content;
+        document.getElementById('alarmNoteTitle').innerText = note.title; document.getElementById('alarmNoteContent').innerText = note.content;
         document.getElementById('alarmModal').style.display = 'block';
-
-        // استدعاء صوت أندرويد الأصلي بدلاً من صوت المتصفح
-        if (typeof Android !== 'undefined' && Android.startAlarmSound) {
-            Android.startAlarmSound();
-        }
-
-        if (navigator.vibrate) navigator.vibrate([500, 300, 500, 300, 500]);
+        if (typeof Android !== 'undefined' && Android.startAlarmSound) Android.startAlarmSound();
+        if (navigator.vibrate) navigator.vibrate([500, 300, 500]);
+    }
+    async function stopAlarmUI(e, id) {
+        if(e) { e.preventDefault(); e.stopPropagation(); }
+        const tid = id || currentAlarmingNoteId; if(!tid) return;
+        if (typeof Android !== 'undefined' && Android.stopAlarmSound) Android.stopAlarmSound();
+        isAlarmActive = false; document.getElementById('alarmModal').style.display = 'none';
+        try { await _supabase.from('notes').update({ alarm_stopped: true }).eq('id', tid); } catch(err) {}
+        const btn = document.getElementById(`stop-btn-${tid}`); if(btn) { btn.classList.add('stopped'); btn.innerHTML = '✅'; btn.style.display = 'flex'; }
     }
 
-    async function stopAlarmUI(event, id) {
-        if(event) { event.preventDefault(); event.stopPropagation(); }
-        const targetId = id || currentAlarmingNoteId; if(!targetId) return;
-
-        // إيقاف صوت أندرويد الأصلي
-        if (typeof Android !== 'undefined' && Android.stopAlarmSound) {
-            Android.stopAlarmSound();
-        }
-
-        const localNote = rawData.find(n => n.id == targetId); if(localNote) localNote.alarm_stopped = true;
-        isAlarmActive = false;
-        try { await _supabase.from('notes').update({ alarm_stopped: true }).eq('id', targetId); } catch(e) {}
-        document.getElementById('alarmModal').style.display = 'none';
-        if (navigator.vibrate) navigator.vibrate(0);
-        const smallBtn = document.getElementById(`stop-btn-${targetId}`); if(smallBtn) { smallBtn.classList.add('stopped'); smallBtn.innerHTML = '✅'; smallBtn.style.background = '#2ecc71'; smallBtn.style.display = 'flex'; }
-    }
-
-    window.addEventListener('deviceorientation', (e) => { if (isAlarmActive && Math.abs(e.beta) > 160) stopAlarmUI(); });
-    setInterval(updateAllCountdowns, 1000);
-    function openEdit(id) { const n = rawData.find(x => x.id == id); if(!n) return; stopAlarmUI(null, id); editingId = id; tempEditMedia = n.media_url ? n.media_url.split('||') : []; document.getElementById('editTitle').value = n.title; document.getElementById('editText').value = n.content; if(n.reminder_at) { const d = new Date(n.reminder_at); document.getElementById('editDate').value = d.toISOString().split('T')[0]; document.getElementById('editTime').value = d.toTimeString().slice(0,5); } renderEditGallery(); document.getElementById('editModal').style.display = 'block'; }
-    function renderEditGallery() { const g = document.getElementById('currentEditGallery'); g.innerHTML = ''; tempEditMedia.forEach((u, i) => { const d = document.createElement('div'); d.className = 'preview-wrapper'; d.innerHTML = `${u.match(/\.(mp4|webm|ogg)$/i) ? `<video src="${u}"></video>` : `<img src="${u}">`}<button class="remove-media-btn" onclick="removeMedia(${i})">×</button>`; g.appendChild(d); }); }
-    function removeMedia(i) { tempEditMedia.splice(i, 1); renderEditGallery(); }
-    async function handleNewEditFile() { const f = document.getElementById('editFile').files[0]; if(!f) return; const url = await uploadFile(f); if(url) { tempEditMedia.push(url); renderEditGallery(); } }
-    async function updateNote() { const b = document.getElementById('updateBtn'); b.disabled = true; b.innerText = "Updating... ⏳"; try { const m = tempEditMedia.join('||'), t = document.getElementById('editTitle').value, c = document.getElementById('editText').value, d = document.getElementById('editDate').value, tm = document.getElementById('editTime').value, r = d ? (new Date(`${d}T${tm || '00:00'}`)) : null; if(r && typeof Android !== 'undefined') Android.scheduleAlarm(t, c.substring(0,50), r.getTime()); await _supabase.from('notes').update({ title: t, content: c, media_url: m, reminder_at: r ? r.toISOString() : null, alarm_stopped: false }).eq('id', editingId); location.reload(); } catch(e) { alert("Update failed: " + e.message); b.disabled = false; b.innerText = "Save Changes"; } }
-    function logout() { localStorage.clear(); location.reload(); }
+    // --- UI Helpers ---
     function zoom(u, t) { const lb = document.getElementById('lightbox'); lb.innerHTML = t==='v' ? `<video src="${u}" controls autoplay></video>` : `<img src="${u}">`; lb.style.display='flex'; }
-    function changeView(v) { currentView = v; document.getElementById('tabActive').classList.toggle('active', v === 'active'); document.getElementById('tabHistory').classList.toggle('active', v === 'history'); fetchNotes(); }
+    function openEdit(id) { const n = rawData.find(x => x.id == id); if(!n) return; editingId = id; document.getElementById('editTitle').value = n.title; document.getElementById('editText').value = n.content; document.getElementById('editModal').style.display = 'block'; }
     function closeModal() { document.getElementById('editModal').style.display='none'; editingId = null; }
-    async function markDone(id, btn) {
-        if(btn) {
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner"></span> Archiving...';
-            btn.style.opacity = '0.7';
-        }
-        try {
-            await _supabase.from('notes').update({is_completed: true}).eq('id', id);
-            fetchNotes();
-        } catch(e) {
-            if(btn) {
-                btn.disabled = false;
-                btn.innerHTML = 'Archive ✅';
-                btn.style.opacity = '1';
-            }
-        }
-    }
     function askDelete(id) { document.getElementById('confirmModal').style.display='block'; document.getElementById('finalDeleteBtn').onclick=()=> { _supabase.from('notes').delete().eq('id', id).then(()=>location.reload()); }; }
     function closeConfirm() { document.getElementById('confirmModal').style.display='none'; }
+    async function markDone(id, btn) { if(btn) btn.disabled = true; await _supabase.from('notes').update({is_completed: true}).eq('id', id); fetchNotes(); }
 
+    // --- Init ---
     if(currentUser) {
         document.getElementById('auth-container').style.display = 'none';
         document.getElementById('journal-app').style.display = 'flex';
@@ -263,6 +361,7 @@
         document.getElementById('user-avatar-text').innerHTML = coloredName;
         fetchNotes();
     } else { setMode('login'); }
+    setInterval(updateAllCountdowns, 1000);
 </script>
 </body>
 </html>
