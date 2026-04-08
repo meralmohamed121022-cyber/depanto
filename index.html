@@ -110,10 +110,168 @@
         .alarm-active { animation: alarm-pulse 0.5s infinite alternate; }
         .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; margin-right: 8px; vertical-align: middle; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        /* حاوية الذكر عشان تسمح بظهور اللي تحتها */
+.zikr-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: 15px;
+    margin-bottom: 12px;
+    background: #ff4444; /* لون زرار المسح اللي هيظهر */
+}
+
+/* زرار المسح اللي ورا الكارت */
+.delete-action {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    z-index: 1;
+}
+
+/* تعديل الكارت عشان يتحرك فوق الحاوية */
+.azkar-card {
+    position: relative;
+    z-index: 2;
+    margin-bottom: 0 !important; /* لغي المارجن عشان الحاوية شايلاه */
+    transition: transform 0.3s ease; /* عشان الرجوع يبقى ناعم */
+    touch-action: pan-y; /* عشان ميحصلش تعارض مع السكرول */
+}
+
+.azkar-card.swiping {
+    transition: none; /* شيل الترانزيشن وقت السحب الفعلي */
+}
+/* حاوية الأزرار الخلفية */
+.zikr-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: 15px;
+    margin-bottom: 12px;
+    background: #eee; /* لون محايد للخلفية */
+    display: flex;
+    align-items: stretch;
+}
+
+/* زر التعديل (يسار) */
+.action-edit-left {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 80px;
+    background: #3498db; /* لون أزرق للتعديل */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+    z-index: 1;
+}
+
+/* زر المسح (يمين) */
+.action-delete-right {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 80px;
+    background: #e74c3c; /* لون أحمر للمسح */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+    z-index: 1;
+}
+
+/* الـ Modal الجديد (CSS Art) */
+.custom-modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 31, 63, 0.85);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100000;
+    backdrop-filter: blur(5px);
+}
+
+.custom-modal-art {
+    background: white;
+    padding: 30px;
+    border-radius: 25px;
+    width: 85%;
+    max-width: 350px;
+    text-align: center;
+    border-bottom: 8px solid var(--orange);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    transform: translateY(20px);
+    transition: 0.3s;
+}
+
+.modal-icon-art {
+    font-size: 50px;
+    margin-bottom: 15px;
+    display: inline-block;
+    animation: shake 0.5s infinite alternate;
+}
+
+@keyframes shake {
+    from { transform: rotate(-5deg); }
+    to { transform: rotate(5deg); }
+}
+/* حاوية المودال الفنية */
+.art-modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 31, 63, 0.9); display: none;
+    align-items: center; justify-content: center; z-index: 200000;
+    backdrop-filter: blur(8px);
+}
+.art-modal-box {
+    background: white; padding: 25px; border-radius: 25px;
+    width: 90%; max-width: 360px; text-align: center;
+    border-bottom: 8px solid var(--orange); box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+    animation: modalPop 0.3s cubic-bezier(0.17, 0.89, 0.32, 1.49);
+}
+.art-modal-input {
+    width: 100%; padding: 12px; margin: 15px 0;
+    border: 2px solid #eee; border-radius: 12px;
+    font-size: 16px; outline: none; text-align: center;
+    color: var(--dark-blue);
+}
+.art-modal-input:focus { border-color: var(--orange); }
+@keyframes modalPop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+/* الألوان المتاحة للنوتس */
+.color-picker-container {
+    display: flex;
+    gap: 8px;
+    margin: 10px 0;
+    justify-content: center;
+}
+.color-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid rgba(0,0,0,0.1);
+    transition: 0.2s;
+}
+.color-dot:hover { transform: scale(1.2); }
+.color-dot.selected { border-color: var(--orange); box-shadow: 0 0 5px var(--orange); }
+
+/* تعديل بسيط للكارت عشان يستوعب خلفيات مختلفة */
+.note-card {
+    transition: background 0.3s ease;
+}
     </style>
 </head>
 <body>
-
 <div id="auth-container">
     <h2 id="auth-title">Mo's Vault 🔒</h2>
     <div class="auth-tabs">
@@ -133,14 +291,15 @@
 
     <div id="main-view-container" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
         <input type="text" id="fuzzySearch" class="search-box" placeholder="Search notes & azkar...">
+
         <div class="nav-tabs">
             <button id="tabActive" class="tab-btn active" onclick="changeView('active')">My Notes</button>
             <button id="tabHistory" class="tab-btn" onclick="changeView('history')">Archive</button>
             <button id="tabAzkar" class="tab-btn" onclick="changeView('azkar')">Azkar ✨</button>
+            <button id="tabFiles" class="tab-btn" onclick="changeView('files')">My Files 📁</button>
         </div>
 
-        <!-- Notes Section -->
-        <div id="notes-section">
+        <div id="notes-section" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
             <div class="glass-input" id="entryForm">
                 <input type="text" id="noteTitle" placeholder="Note Title">
                 <textarea id="noteText" rows="3" placeholder="What's on your mind?"></textarea>
@@ -158,8 +317,7 @@
             <div id="notesLayout" style="width: 100%;"></div>
         </div>
 
-        <!-- Azkar Section -->
-        <div id="azkar-section">
+        <div id="azkar-section" style="width: 100%; display: none; flex-direction: column; align-items: center;">
             <div id="category-selector" class="category-box-container">
                 <div class="category-box morning" onclick="selectAzkarCategory('morning')">☀️ أذكار الصباح</div>
                 <div class="category-box evening" onclick="selectAzkarCategory('evening')">🌙 أذكار المساء</div>
@@ -180,10 +338,23 @@
                 <div class="azkar-grid" id="azkarGrid"></div>
             </div>
         </div>
+
+        <div id="files-section" style="display:none; width: 100%; flex-direction: column; align-items: center;">
+            <div class="glass-input">
+                <div class="file-upload-art" onclick="document.getElementById('fileInputGeneral').click()" style="border-style: solid; background: #f0f7ff; color: var(--dark-blue);">
+                    <span id="fileInputLabel">Upload Any File (PDF, Excel, Doc...) 📤</span>
+                    <input type="file" id="fileInputGeneral" hidden onchange="uploadGeneralFile()">
+                </div>
+                <div id="uploadProgress" style="display:none; font-size:12px; color:var(--orange); margin-top:10px; text-align:center; font-weight:bold;">
+                    Uploading to Vault... ⏳
+                </div>
+            </div>
+            <div id="filesLayout" style="width: 100%;"></div>
+        </div>
+
     </div>
 </div>
 
-<!-- Fingerprint Floating Button -->
 <div id="fingerprint-container">
     <div class="pulse-ring"></div>
     <div class="fingerprint-btn" onclick="incrementSelectedZikr()">
@@ -191,7 +362,6 @@
     </div>
 </div>
 
-<!-- Modals -->
 <div id="confirmModal" class="modal"><div class="modal-content"><h3>Are you sure? 🗑️</h3><p>This entry will be permanently deleted.</p><div class="alert-btns"><button class="alert-btn" style="background: #eee;" onclick="closeConfirm()">Cancel</button><button id="finalDeleteBtn" class="alert-btn" style="background: #ff4444; color: white;">Delete</button></div></div></div>
 <div id="editModal" class="modal"><div class="modal-content"><h3>Edit Entry ✏️</h3><input type="text" id="editTitle" class="auth-input"><textarea id="editText" rows="5" class="auth-input"></textarea><div style="display:flex; gap:10px; margin-bottom:10px;"><div style="flex:1; text-align:left;"><label style="font-size:12px; font-weight:bold; color:var(--dark-blue)">Date</label><input type="date" id="editDate" class="auth-input"></div><div style="flex:1; text-align:left;"><label style="font-size:12px; font-weight:bold; color:var(--dark-blue)">Time</label><input type="time" id="editTime" class="auth-input"></div></div><div id="currentEditGallery" class="edit-media-preview"></div><div class="file-upload-art" onclick="document.getElementById('editFile').click()"><span id="editFileLabel">Add Media ➕</span><input type="file" id="editFile" hidden onchange="handleNewEditFile()"></div><button id="updateBtn" class="auth-btn" onclick="updateNote()">Save Changes</button><button class="auth-btn" style="background:#eee; color:#333; margin-top:10px;" onclick="closeModal()">Cancel</button></div></div>
 <div id="alarmModal" class="modal"><div class="modal-content alarm-active" style="border: 4px solid var(--orange);"><h2 style="color: var(--orange);">⏰ Time's Up!</h2><h3 id="alarmNoteTitle">Note</h3><p id="alarmNoteContent" style="max-height: 150px; overflow-y: auto;"></p><button class="auth-btn" style="background: var(--orange);" onclick="stopAlarmUI(event)">Stop Alarm ✅</button></div></div>
@@ -265,35 +435,110 @@
         isAzkarFocusMode = true;
         changeView('azkar');
     }
-    function renderStructure(notes) {
-        const layout = document.getElementById('notesLayout'); layout.innerHTML = '';
-        const groups = notes.reduce((acc, n) => { const d = n.reminder_at ? new Date(n.reminder_at) : new Date(n.created_at); const day = d.toLocaleDateString('en-US', {weekday:'long', day:'numeric', month:'long'}); if(!acc[day]) acc[day] = []; acc[day].push(n); return acc; }, {});
-        for (const day in groups) {
-            const section = document.createElement('div'); section.innerHTML = `<div class="day-header">${day}</div>`;
-            const row = document.createElement('div'); row.className = 'journal-row';
-            groups[day].forEach(n => {
-                const card = document.createElement('div'); card.className = 'note-card'; card.id = `note-${n.id}`;
-                const urls = n.media_url ? n.media_url.split('||') : [];
-                let galleryHtml = urls.length > 0 ? `<div class="media-gallery">` + urls.map(u => u.match(/\.(mp4|webm|ogg)$/i) ? `<video src="${u}" class="gallery-item" onclick="zoom('${u}','v')"></video>` : `<img src="${u}" class="gallery-item" onclick="zoom('${u}','i')">`).join('') + `</div>` : '';
-                const countdownHtml = n.reminder_at && !n.is_completed && !n.alarm_stopped ? `<div class="countdown-timer" id="timer-${n.id}" data-time="${n.reminder_at}">...</div>` : '';
-                card.innerHTML = `<div class="card-actions"><button class="action-btn" onclick="openEdit('${n.id}')">✏️</button><button class="action-btn" onclick="askDelete('${n.id}')">🗑️</button><button class="action-btn stop-alarm-small" id="stop-btn-${n.id}" onclick="stopAlarmUI(event, '${n.id}')">🔕</button></div><div style="font-size:10px; opacity:0.5; margin-top:15px; display:flex; justify-content:space-between; align-items:center;"><span>${n.reminder_at ? new Date(n.reminder_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : ''}</span>${countdownHtml}</div><h3 style="margin:5px 0;">${n.title}</h3>${galleryHtml}<p style="white-space: pre-wrap; flex-grow:1; font-size:14px;">${n.content}</p>${!n.is_completed ? `<button onclick="markDone('${n.id}', this)" style="background:var(--orange); border:none; color:white; padding:12px; border-radius:8px; width:100%; margin-top:10px; font-weight:bold; display:flex; align-items:center; justify-content:center;">Archive ✅</button>` : ''}`;
-                row.appendChild(card);
-            });
-            section.appendChild(row); layout.appendChild(section);
+   function renderStructure(notes) {
+    const layout = document.getElementById('notesLayout'); layout.innerHTML = '';
+
+    // مصفوفة الألوان (باستيل هادئة عشان تليق مع الخط الأسود)
+    const noteColors = ['#fdfcf0', '#e3f2fd', '#f1f8e9', '#fff3e0', '#fce4ec', '#f3e5f5', '#e8eaf6'];
+
+    const groups = notes.reduce((acc, n) => {
+        const d = n.reminder_at ? new Date(n.reminder_at) : new Date(n.created_at);
+        const day = d.toLocaleDateString('en-US', {weekday:'long', day:'numeric', month:'long'});
+        if(!acc[day]) acc[day] = []; acc[day].push(n); return acc;
+    }, {});
+
+    for (const day in groups) {
+        const section = document.createElement('div'); section.innerHTML = `<div class="day-header">${day}</div>`;
+        const row = document.createElement('div'); row.className = 'journal-row';
+
+        groups[day].forEach(n => {
+            const card = document.createElement('div');
+            card.className = 'note-card';
+            card.id = `note-${n.id}`;
+
+            // تطبيق اللون المحفوظ أو اللون الافتراضي
+            card.style.backgroundColor = n.color || '#fdfcf0';
+            card.style.transition = 'background 0.3s ease';
+
+            // إنشاء شريط اختيار الألوان داخل الكارت
+            const colorPickerHtml = `<div style="display:flex; gap:5px; margin-top:10px; padding-top:5px; border-top:1px solid rgba(0,0,0,0.05);">
+                ${noteColors.map(c => `
+                    <div onclick="updateNoteColor('${n.id}', '${c}')"
+                         style="width:18px; height:18px; border-radius:50%; background:${c}; cursor:pointer; border:1px solid rgba(0,0,0,0.1); shadow: 0 1px 2px rgba(0,0,0,0.1);">
+                    </div>`).join('')}
+            </div>`;
+
+            const urls = n.media_url ? n.media_url.split('||') : [];
+            let galleryHtml = urls.length > 0 ? `<div class="media-gallery">` + urls.map(u => u.match(/\.(mp4|webm|ogg)$/i) ? `<video src="${u}" class="gallery-item" onclick="zoom('${u}','v')"></video>` : `<img src="${u}" class="gallery-item" onclick="zoom('${u}','i')">`).join('') + `</div>` : '';
+            const countdownHtml = n.reminder_at && !n.is_completed && !n.alarm_stopped ? `<div class="countdown-timer" id="timer-${n.id}" data-time="${n.reminder_at}">...</div>` : '';
+
+            card.innerHTML = `
+                <div class="card-actions">
+                    <button class="action-btn" onclick="openEdit('${n.id}')">✏️</button>
+                    <button class="action-btn" onclick="askDelete('${n.id}')">🗑️</button>
+                    <button class="action-btn stop-alarm-small" id="stop-btn-${n.id}" onclick="stopAlarmUI(event, '${n.id}')">🔕</button>
+                </div>
+                <div style="font-size:10px; opacity:0.5; margin-top:15px; display:flex; justify-content:space-between; align-items:center;">
+                    <span>${n.reminder_at ? new Date(n.reminder_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : ''}</span>
+                    ${countdownHtml}
+                </div>
+                <h3 style="margin:5px 0;">${n.title}</h3>
+                ${galleryHtml}
+                <p style="white-space: pre-wrap; flex-grow:1; font-size:14px;">${n.content}</p>
+                ${colorPickerHtml}
+                ${!n.is_completed ? `<button onclick="markDone('${n.id}', this)" style="background:var(--orange); border:none; color:white; padding:12px; border-radius:8px; width:100%; margin-top:10px; font-weight:bold; display:flex; align-items:center; justify-content:center;">Archive ✅</button>` : ''}
+            `;
+            row.appendChild(card);
+        });
+        section.appendChild(row); layout.appendChild(section);
+    }
+    updateAllCountdowns();
+}
+   async function handleSave() {
+    const titleInput = document.getElementById('noteTitle'),
+          contentInput = document.getElementById('noteText'),
+          saveBtn = document.getElementById('mainSaveBtn');
+
+    if(!contentInput.value.trim()) return;
+    saveBtn.disabled = true;
+    saveBtn.innerText = "Saving... ⏳";
+
+    // مصفوفة الألوان الباستيل المبهجة
+    const noteColors = ['#fdfcf0', '#e3f2fd', '#f1f8e9', '#fff3e0', '#fce4ec', '#f3e5f5', '#e8eaf6'];
+    // اختيار لون عشوائي عند الحفظ لأول مرة
+    const randomColor = noteColors[Math.floor(Math.random() * noteColors.length)];
+
+    try {
+        const d = document.getElementById('noteDate').value,
+              t = document.getElementById('noteTime').value,
+              reminder = d ? (new Date(`${d}T${t || '00:00'}`)) : null;
+
+        if(reminder && typeof Android !== 'undefined') {
+            Android.scheduleAlarm(titleInput.value || "Untitled", contentInput.value.substring(0,50), reminder.getTime());
         }
-        updateAllCountdowns();
+
+        const file = document.getElementById('noteFile').files[0],
+              url = await uploadFile(file);
+
+        // إضافة حقل color في الـ insert ليروح لسوبابيز
+        await _supabase.from('notes').insert([{
+            title: titleInput.value || "Untitled",
+            content: contentInput.value,
+            media_url: url,
+            owner_name: currentUser,
+            reminder_at: reminder ? reminder.toISOString() : null,
+            is_completed: false,
+            alarm_stopped: false,
+            color: randomColor // حفظ اللون العشوائي المختار
+        }]);
+
+        location.reload();
+    } catch(err) {
+        alert("Save failed: " + err.message);
+        saveBtn.disabled = false;
+        saveBtn.innerText = "Save Now ✨";
     }
-    async function handleSave() {
-        const titleInput = document.getElementById('noteTitle'), contentInput = document.getElementById('noteText'), saveBtn = document.getElementById('mainSaveBtn');
-        if(!contentInput.value.trim()) return; saveBtn.disabled = true; saveBtn.innerText = "Saving... ⏳";
-        try {
-            const d = document.getElementById('noteDate').value, t = document.getElementById('noteTime').value, reminder = d ? (new Date(`${d}T${t || '00:00'}`)) : null;
-            if(reminder && typeof Android !== 'undefined') Android.scheduleAlarm(titleInput.value || "Untitled", contentInput.value.substring(0,50), reminder.getTime());
-            const file = document.getElementById('noteFile').files[0], url = await uploadFile(file);
-            await _supabase.from('notes').insert([{ title: titleInput.value || "Untitled", content: contentInput.value, media_url: url, owner_name: currentUser, reminder_at: reminder ? reminder.toISOString() : null, is_completed: false, alarm_stopped: false }]);
-            location.reload();
-        } catch(err) { alert("Save failed: " + err.message); saveBtn.disabled = false; saveBtn.innerText = "Save Now ✨"; }
-    }
+}
     async function uploadFile(file) { if(!file) return null; const name = `${Date.now()}_${file.name}`; await _supabase.storage.from('media').upload(name, file); return _supabase.storage.from('media').getPublicUrl(name).data.publicUrl; }
     function setToday() { const n = new Date(); document.getElementById('noteDate').value = n.toISOString().split('T')[0]; document.getElementById('noteTime').value = n.toTimeString().slice(0,5); }
 
@@ -377,64 +622,96 @@
         if (azkarList.length > 0 && selectedZikrId === null) selectedZikrId = azkarList[0].id;
         renderAzkar();
     }
-    function renderAzkar(customList = null) {
-        const grid = document.getElementById('azkarGrid'); grid.innerHTML = '';
-        const listToRender = customList || azkarList;
-        const addContainer = document.querySelector('.add-zikr-container');
-        const fingerprint = document.getElementById('fingerprint-container');
+  function renderAzkar(customList = null) {
+    const grid = document.getElementById('azkarGrid'); grid.innerHTML = '';
+    const listToRender = customList || azkarList;
+    const addContainer = document.querySelector('.add-zikr-container');
+    const fingerprint = document.getElementById('fingerprint-container');
 
-        if (isAzkarFocusMode && selectedZikrId && !customList) {
-            addContainer.style.display = 'none';
-            fingerprint.style.display = 'flex';
-            const zikr = azkarList.find(z => z.id === selectedZikrId);
-            if (zikr) {
-                const backBtn = document.createElement('button');
-                backBtn.className = 'auth-btn';
-                backBtn.style = 'width: 100%; margin-bottom: 20px; background: rgba(0,0,0,0.3); border: 2px solid var(--orange); height: 50px; font-size: 18px;';
-                backBtn.innerHTML = '⬅ العودة للقائمة';
-                backBtn.onclick = () => { isAzkarFocusMode = false; renderAzkar(); };
-                grid.appendChild(backBtn);
+    if (isAzkarFocusMode && selectedZikrId && !customList) {
+        addContainer.style.display = 'none';
+        fingerprint.style.display = 'flex';
+        const zikr = azkarList.find(z => z.id == selectedZikrId);
+        if (zikr) {
+            const backBtn = document.createElement('button');
+            backBtn.className = 'auth-btn';
+            backBtn.style = 'width: 100%; margin-bottom: 20px; background: rgba(0,0,0,0.3); border: 2px solid var(--orange); height: 50px; font-size: 18px;';
+            backBtn.innerHTML = '⬅ العودة للقائمة';
+            backBtn.onclick = () => { isAzkarFocusMode = false; renderAzkar(); };
+            grid.appendChild(backBtn);
 
-                const card = document.createElement('div');
-                card.className = `azkar-card selected focus-card`;
-                card.style.cssText = 'flex-direction: column; height: auto; min-height: 400px; padding: 40px 20px; border-radius: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.4);';
-                card.innerHTML = `
-                    <div class="azkar-text" style="font-size: 28px; text-align:center; padding:0; width:100%; color:var(--dark-blue); line-height: 1.4; max-height: 200px; overflow-y: auto;">${zikr.text}</div>
-                    <div style="font-size: 14px; color: #666; margin-top: 10px;">الهدف: ${zikr.target || '∞'}</div>
-                    <div style="display:flex; flex-direction:column; align-items:center; gap:25px; margin-top:30px; width:100%;">
-                        <div class="azkar-counter" id="zikr-count-${zikr.id}" style="font-size: 80px; text-align:center; width:100%; color: var(--orange); font-family: 'Courier New', monospace; text-shadow: 3px 3px 0px var(--book-spine);">${zikr.count}</div>
-                        <button class="azkar-reset" onclick="event.stopPropagation(); resetZikr('${zikr.id}')" style="margin-right:0; width:60px; height:60px;"></button>
-                    </div>
-                `;
-                grid.appendChild(card);
-            }
-        } else {
-            addContainer.style.display = customList ? 'none' : 'flex';
-            fingerprint.style.display = 'none';
-            listToRender.forEach(zikr => {
-                const card = document.createElement('div');
-                card.className = `azkar-card ${zikr.id === selectedZikrId ? 'selected' : ''}`;
-                card.onclick = () => { selectedZikrId = zikr.id; isAzkarFocusMode = true; renderAzkar(); };
-                card.innerHTML = `
-                    <div style="display:flex; align-items:center;">
-                        <button class="azkar-reset" onclick="event.stopPropagation(); resetZikr('${zikr.id}')" style="width:35px; height:35px; box-shadow: 0 3px 0 var(--book-spine);"></button>
-                        <div class="azkar-counter" id="zikr-count-${zikr.id}">${zikr.count}</div>
-                    </div>
-                    <div style="display:flex; flex-direction:column; align-items:flex-end;">
-                        <div class="azkar-text">${zikr.text.substring(0, 50)}${zikr.text.length > 50 ? '...' : ''}</div>
-                        <div style="font-size: 12px; color: var(--orange); font-weight: bold;">الهدف: ${zikr.target || 0}</div>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-            if (customList && customList.length === 0) {
-                grid.innerHTML = '<div style="text-align:center; padding:20px; opacity:0.6;">No matching azkar found.</div>';
-            }
+            const card = document.createElement('div');
+            card.className = `azkar-card selected focus-card`;
+            card.style.cssText = 'flex-direction: column; height: auto; min-height: 400px; padding: 40px 20px; border-radius: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.4);';
+            card.innerHTML = `
+                <div class="azkar-text" style="font-size: 28px; text-align:center; padding:0; width:100%; color:var(--dark-blue); line-height: 1.4; max-height: 200px; overflow-y: auto;">${zikr.text}</div>
+                <div style="font-size: 14px; color: #666; margin-top: 10px; cursor:pointer;" onclick="event.stopPropagation(); editTarget('${zikr.id}')">الهدف: ${zikr.target || '∞'} ✏️</div>
+                <div style="display:flex; flex-direction:column; align-items:center; gap:25px; margin-top:30px; width:100%;">
+                    <div class="azkar-counter" id="zikr-count-${zikr.id}" style="font-size: 80px; text-align:center; width:100%; color: var(--orange); font-family: 'Courier New', monospace; text-shadow: 3px 3px 0px var(--book-spine);">${zikr.count}</div>
+                    <button class="azkar-reset" onclick="event.stopPropagation(); resetZikr('${zikr.id}')" style="margin-right:0; width:60px; height:60px;"></button>
+                </div>
+            `;
+            grid.appendChild(card);
+        }
+    } else {
+        addContainer.style.display = customList ? 'none' : 'flex';
+        fingerprint.style.display = 'none';
+        listToRender.forEach(zikr => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'zikr-wrapper';
+            // الخلفية الأساسية للحاوية تكون محايدة
+            wrapper.style.cssText = 'position:relative; overflow:hidden; border-radius:15px; margin-bottom:12px; background:#f0f0f0; width:100%; display:flex;';
+
+            // زر التعديل (يظهر عند السحب لليمين - مكانه في الشمال)
+            const editBtn = document.createElement('div');
+            editBtn.style.cssText = 'position:absolute; left:0; top:0; bottom:0; width:80px; background:#3498db; display:flex; align-items:center; justify-content:center; color:white; font-size:20px; z-index:1; cursor:pointer;';
+            editBtn.innerHTML = '✏️';
+            editBtn.onclick = (e) => { e.stopPropagation(); editZikrText(zikr.id); };
+            wrapper.appendChild(editBtn);
+
+            // زر المسح (يظهر عند السحب للشمال - مكانه في اليمين)
+            const delBtn = document.createElement('div');
+            delBtn.style.cssText = 'position:absolute; right:0; top:0; bottom:0; width:80px; background:#e74c3c; display:flex; align-items:center; justify-content:center; color:white; font-size:20px; z-index:1; cursor:pointer;';
+            delBtn.innerHTML = '🗑️';
+            delBtn.onclick = (e) => { e.stopPropagation(); showConfirmDelete(zikr.id); };
+            wrapper.appendChild(delBtn);
+
+            const card = document.createElement('div');
+            card.className = `azkar-card ${zikr.id == selectedZikrId ? 'selected' : ''}`;
+            card.style.cssText = 'position:relative; z-index:2; width:100%; margin:0; transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28); cursor: pointer;';
+
+            card.onclick = () => {
+                // لو الكارت مفتوح (مسحوب)، رجعه مكانه بدل ما يفتح
+                if (card.style.transform && card.style.transform !== 'translateX(0px)') {
+                    card.style.transform = 'translateX(0px)';
+                    return;
+                }
+                selectedZikrId = zikr.id; isAzkarFocusMode = true; renderAzkar();
+            };
+
+            card.innerHTML = `
+                <div style="display:flex; align-items:center;">
+                    <button class="azkar-reset" onclick="event.stopPropagation(); resetZikr('${zikr.id}')" style="width:35px; height:35px; box-shadow: 0 3px 0 var(--book-spine);"></button>
+                    <div class="azkar-counter" id="zikr-count-${zikr.id}">${zikr.count}</div>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:flex-end;">
+                    <div class="azkar-text">${zikr.text.substring(0, 50)}${zikr.text.length > 50 ? '...' : ''}</div>
+                    <div style="font-size: 12px; color: var(--orange); font-weight: bold; cursor:pointer;" onclick="event.stopPropagation(); editTarget('${zikr.id}')">الهدف: ${zikr.target || 0} ✏️</div>
+                </div>
+            `;
+
+            setupDualSwipe(card); // تفعيل السحب يمين وشمال
+            wrapper.appendChild(card);
+            grid.appendChild(wrapper);
+        });
+        if (customList && customList.length === 0) {
+            grid.innerHTML = '<div style="text-align:center; padding:20px; opacity:0.6;">No matching azkar found.</div>';
         }
     }
+}
     function incrementSelectedZikr() {
         if (!selectedZikrId) return;
-        const zikrIndex = azkarList.findIndex(z => z.id === selectedZikrId);
+        const zikrIndex = azkarList.findIndex(z => z.id == selectedZikrId);
         const zikr = azkarList[zikrIndex];
         if (zikr) {
             zikr.count++;
@@ -458,9 +735,11 @@
         }
     }
     async function resetZikr(id) {
-        const zikr = azkarList.find(z => z.id === id);
+        const zikr = azkarList.find(z => z.id == id);
         if (zikr) { zikr.count = 0; const el = document.getElementById(`zikr-count-${id}`); if(el) el.innerText = 0; await _supabase.from('azkar').update({ count: 0 }).eq('id', id); }
     }
+
+
     async function addNewZikr() {
         const input = document.getElementById('newZikrInput'), text = input.value.trim();
         const targetInput = document.getElementById('newZikrTarget'), target = parseInt(targetInput.value) || 33;
@@ -493,31 +772,102 @@
         }
     }
 
-    // --- View ---
-    function changeView(v) {
-        currentView = v;
-        isAzkarFocusMode = false;
-        document.getElementById('fuzzySearch').value = '';
-        document.getElementById('tabActive').classList.toggle('active', v === 'active');
-        document.getElementById('tabHistory').classList.toggle('active', v === 'history');
-        document.getElementById('tabAzkar').classList.toggle('active', v === 'azkar');
-        document.getElementById('notes-section').style.display = v === 'azkar' ? 'none' : 'flex';
-        document.getElementById('fuzzySearch').style.display = v === 'azkar' ? 'none' : 'block';
-        document.getElementById('azkar-section').style.display = v === 'azkar' ? 'flex' : 'none';
-
-        if (v === 'azkar') {
-            if (!currentAzkarCategory) {
-                document.getElementById('category-selector').style.display = 'grid';
-                document.getElementById('azkar-list-view').style.display = 'none';
-            } else {
-                fetchAzkar();
-            }
+    // --- Back Button Navigation ---
+    let lastBackPress = 0;
+    function handleBack() {
+        // 1. Close Modals/Popups first
+        if (isAlarmActive) {
+            stopAlarmUI();
+            return;
+        }
+        if (document.getElementById('editModal').style.display === 'block') {
+            closeModal();
+            return;
+        }
+        if (document.getElementById('confirmModal').style.display === 'block') {
+            closeConfirm();
+            return;
+        }
+        if (document.getElementById('lightbox').style.display === 'flex') {
+            document.getElementById('lightbox').style.display = 'none';
+            return;
         }
 
-        document.getElementById('fingerprint-container').style.display = 'none';
-        if (v !== 'azkar') fetchNotes();
-    }
+        // 2. Azkar Section Navigation
+        if (currentView === 'azkar') {
+            if (isAzkarFocusMode) {
+                isAzkarFocusMode = false;
+                renderAzkar();
+            } else if (currentAzkarCategory) {
+                backToCategories();
+            } else {
+                changeView('active');
+            }
+            return; // Prevent falling through to exit logic
+        }
 
+        // 3. History View Navigation
+        if (currentView === 'history') {
+            changeView('active');
+            return;
+        }
+
+        // 4. Search active - Clear it
+        if (document.getElementById('fuzzySearch').value !== '') {
+            document.getElementById('fuzzySearch').value = '';
+            if (currentView === 'azkar') renderAzkar(); else renderStructure(rawData);
+            return;
+        }
+
+        // 5. Exit App with safety (Double tap logic)
+        const now = Date.now();
+        if (now - lastBackPress < 2000) {
+            if (typeof Android !== 'undefined' && Android.exitApp) {
+                Android.exitApp();
+            }
+        } else {
+            lastBackPress = now;
+            if (typeof Android !== 'undefined' && Android.showToast) {
+                Android.showToast("اضغط مرة أخرى للخروج");
+            } else {
+                console.log("Press back again to exit");
+            }
+        }
+    }
+function changeView(v) {
+    currentView = v;
+    isAzkarFocusMode = false;
+    document.getElementById('fuzzySearch').value = '';
+
+    // ضبط حالة الأزرار (Active class)
+    document.getElementById('tabActive').classList.toggle('active', v === 'active');
+    document.getElementById('tabHistory').classList.toggle('active', v === 'history');
+    document.getElementById('tabAzkar').classList.toggle('active', v === 'azkar');
+    document.getElementById('tabFiles').classList.toggle('active', v === 'files');
+
+    // إظهار وإخفاء الأقسام
+    document.getElementById('notes-section').style.display = (v === 'active' || v === 'history') ? 'flex' : 'none';
+    document.getElementById('azkar-section').style.display = v === 'azkar' ? 'flex' : 'none';
+    document.getElementById('files-section').style.display = v === 'files' ? 'flex' : 'none';
+
+    // إخفاء السيرش في الأذكار والملفات لو حبيت
+    document.getElementById('fuzzySearch').style.display = (v === 'azkar' || v === 'files') ? 'none' : 'block';
+    document.getElementById('fingerprint-container').style.display = 'none';
+
+    // تحميل البيانات بناءً على التابة
+    if (v === 'files') {
+        fetchFiles();
+    } else if (v === 'azkar') {
+        if (!currentAzkarCategory) {
+            document.getElementById('category-selector').style.display = 'grid';
+            document.getElementById('azkar-list-view').style.display = 'none';
+        } else {
+            fetchAzkar();
+        }
+    } else {
+        fetchNotes();
+    }
+}
     // --- Alarms ---
     function updateAllCountdowns() {
         if(editingId || currentView === 'azkar') return;
@@ -564,6 +914,326 @@
         setupSearch();
     } else { setMode('login'); }
     setInterval(updateAllCountdowns, 1000);
+    function setupSwipe(el, id) {
+    let startX = 0;
+    let currentX = 0;
+    const threshold = -80; // المسافة اللي بعدها الزرار يثبت
+
+    el.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        el.classList.add('swiping');
+    });
+
+    el.addEventListener('touchmove', (e) => {
+        currentX = e.touches[0].clientX - startX;
+        // نسمح بالسحب للشمال فقط وبحد أقصى معين
+        if (currentX < 0 && currentX > -120) {
+            el.style.transform = `translateX(${currentX}px)`;
+        }
+    });
+
+    el.addEventListener('touchend', () => {
+        el.classList.remove('swiping');
+        if (currentX < threshold) {
+            el.style.transform = `translateX(${threshold}px)`; // يثبت على زرار المسح
+        } else {
+            el.style.transform = `translateX(0px)`; // يرجع مكانه
+        }
+        currentX = 0;
+    });
+}
+
+// دالة المسح من سوبابيز
+async function deleteZikr(id) {
+    if (confirm('هل تريد مسح هذا الذكر؟')) {
+        const { error } = await _supabase.from('azkar').delete().eq('id', id);
+        if (!error) {
+            azkarList = azkarList.filter(z => z.id != id);
+            renderAzkar();
+        } else {
+            alert('خطأ في المسح');
+        }
+    }
+}
+// دالة السحب المزدوج (يمين ويسار)
+function setupDualSwipe(el) {
+    let startX = 0;
+    let currentX = 0;
+    el.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; el.style.transition = 'none'; });
+    el.addEventListener('touchmove', (e) => {
+        currentX = e.touches[0].clientX - startX;
+        // السماح بالحركة يمين ويسار بحدود 100 بيكسل
+        if (Math.abs(currentX) < 120) {
+            el.style.transform = `translateX(${currentX}px)`;
+        }
+    });
+    el.addEventListener('touchend', () => {
+        el.style.transition = 'transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28)';
+        if (currentX > 60) el.style.transform = 'translateX(80px)'; // تثبيت زر التعديل
+        else if (currentX < -60) el.style.transform = 'translateX(-80px)'; // تثبيت زر المسح
+        else el.style.transform = 'translateX(0px)';
+        currentX = 0;
+    });
+}
+
+// دالة إظهار رسالة المسح الفنية
+function showConfirmDelete(id) {
+    // لو مش موجودة في الصفحة ننشئها
+    if (!document.getElementById('customDeleteModal')) {
+        const modalHtml = `
+            <div id="customDeleteModal" class="custom-modal-overlay">
+                <div class="custom-modal-art">
+                    <div class="modal-icon-art">⚠️</div>
+                    <h3 style="color:var(--dark-blue); margin:0;">حذف الذكر؟</h3>
+                    <p style="color:#666; font-size:14px;">يا Mo، هل أنت متأكد من حذف هذا الذكر نهائياً؟</p>
+                    <div style="display:flex; gap:10px; margin-top:20px;">
+                        <button class="auth-btn" style="background:#eee; color:#333;" onclick="closeCustomModal()">إلغاء</button>
+                        <button id="confirmDelBtn" class="auth-btn" style="background:#e74c3c;">حذف الآن 🗑️</button>
+                    </div>
+                </div>
+            </div>`;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+    const modal = document.getElementById('customDeleteModal');
+    modal.style.display = 'flex';
+    document.getElementById('confirmDelBtn').onclick = () => {
+        deleteZikr(id);
+        closeCustomModal();
+    };
+}
+
+function closeCustomModal() {
+    document.getElementById('customDeleteModal').style.display = 'none';
+    renderAzkar(); // عشان نرجع الكروت لوضعها الطبيعي
+}
+// دالة المودال الموحدة لجميع الأغراض
+function openArtModal(title, icon, placeholder, value, onConfirm, inputType = 'text') {
+    if (!document.getElementById('artModal')) {
+        const m = `<div id="artModal" class="art-modal-overlay">
+            <div class="art-modal-box">
+                <div id="artModalIcon" style="font-size:45px; margin-bottom:10px;"></div>
+                <h3 id="artModalTitle" style="color:var(--dark-blue); margin:0;"></h3>
+                <input id="artModalInput" class="art-modal-input">
+                <div style="display:flex; gap:10px;">
+                    <button class="auth-btn" style="background:#eee; color:#333;" onclick="closeArtModal()">إلغاء</button>
+                    <button id="artModalConfirm" class="auth-btn" style="background:var(--orange);">حفظ ✨</button>
+                </div>
+            </div>
+        </div>`;
+        document.body.insertAdjacentHTML('beforeend', m);
+    }
+    document.getElementById('artModalTitle').innerText = title;
+    document.getElementById('artModalIcon').innerText = icon;
+    const input = document.getElementById('artModalInput');
+    input.type = inputType;
+    input.placeholder = placeholder;
+    input.value = value;
+    document.getElementById('artModal').style.display = 'flex';
+    document.getElementById('artModalConfirm').onclick = () => { onConfirm(input.value); closeArtModal(); };
+}
+
+function closeArtModal() {
+    document.getElementById('artModal').style.display = 'none';
+    renderAzkar(); // عشان الكروت ترجع مكانها
+}
+
+// 1. تحديث دالة تعديل نص الذكر
+async function editZikrText(id) {
+    const z = azkarList.find(x => x.id == id);
+    openArtModal("تعديل نص الذكر", "✏️", "اكتب الذكر هنا...", z.text, async (newValue) => {
+        if (newValue && newValue !== z.text) {
+            await _supabase.from('azkar').update({ text: newValue }).eq('id', id);
+            z.text = newValue;
+            renderAzkar();
+        }
+    });
+}
+
+// 2. تحديث دالة تعديل الهدف (Target)
+async function editTarget(id) {
+    const z = azkarList.find(x => x.id == id);
+    openArtModal("تعديل الهدف", "🎯", "أدخل العدد المستهدف...", z.target, async (newValue) => {
+        const targetVal = parseInt(newValue) || 0;
+        await _supabase.from('azkar').update({ target: targetVal }).eq('id', id);
+        z.target = targetVal;
+        renderAzkar();
+    }, 'number');
+}
+async function updateNoteColor(id, color) {
+    // تحديث الشكل فوراً (Optimistic UI)
+    const card = document.getElementById(`note-${id}`);
+    if(card) card.style.background = color;
+
+    // التحديث في سوبابيز
+    const { error } = await _supabase.from('notes').update({ color: color }).eq('id', id);
+    if(error) console.error("Color update failed");
+}
+// --- My Files Logic ---
+
+async function uploadGeneralFile() {
+    const fileEl = document.getElementById('fileInputGeneral');
+    const file = fileEl.files[0];
+    if (!file) return;
+
+    const progress = document.getElementById('uploadProgress');
+    const label = document.getElementById('fileInputLabel');
+
+    progress.style.display = 'block';
+    label.innerText = "Processing...";
+
+    try {
+        const fileName = `${Date.now()}_${file.name}`;
+        // 1. الرفع لـ Storage (تأكد أن عندك Bucket اسمه media)
+        const { data, error } = await _supabase.storage.from('media').upload(`files/${fileName}`, file);
+        if (error) throw error;
+
+        const publicUrl = _supabase.storage.from('media').getPublicUrl(`files/${fileName}`).data.publicUrl;
+
+        // 2. الحفظ في جدول my_files
+        await _supabase.from('my_files').insert([{
+            file_name: file.name,
+            file_url: publicUrl,
+            file_type: file.type,
+            file_size: file.size,
+            owner_name: currentUser
+        }]);
+
+        label.innerText = "Upload Success! ✅";
+        setTimeout(() => label.innerText = "Upload Any File (PDF, Excel, Doc...) 📤", 2000);
+        fetchFiles();
+    } catch (err) {
+        alert("Upload failed: " + err.message);
+    } finally {
+        progress.style.display = 'none';
+        fileEl.value = ''; // تصفير المدخل
+    }
+}
+
+async function fetchFiles() {
+    const { data } = await _supabase.from('my_files')
+        .select('*')
+        .eq('owner_name', currentUser)
+        .order('created_at', {ascending: false});
+    renderFiles(data || []);
+}
+function renderFiles(files) {
+    const layout = document.getElementById('filesLayout');
+    layout.innerHTML = '';
+
+    const row = document.createElement('div');
+    row.className = 'journal-row';
+
+    files.forEach(f => {
+        const card = document.createElement('div');
+        card.className = 'note-card';
+        card.style.backgroundColor = '#ffffff';
+        card.style.border = '1px solid #eee';
+
+        // --- منطق التعرف على نوع الملف والبريفيو الشامل ---
+        let previewHtml = '';
+        const type = f.file_type.toLowerCase();
+        const name = f.file_name.toLowerCase();
+
+        if (type.includes('image')) {
+            // صور: بريفيو حقيقي
+            previewHtml = `<img src="${f.file_url}" style="width:100%; height:120px; object-fit:cover; border-radius:10px;">`;
+        } else if (type.includes('pdf')) {
+            // PDF: أيقونة حمراء احترافية
+            previewHtml = `<div style="height:120px; background:#fff1f0; color:#e74c3c; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                <span style="font-size:50px;">📕</span>
+                <span style="font-size:10px; font-weight:bold; margin-top:5px; color:#e74c3c;">PDF DOCUMENT</span>
+            </div>`;
+        } else if (type.includes('sheet') || name.endsWith('.xls') || name.endsWith('.xlsx') || name.endsWith('.csv')) {
+            // Excel: أيقونة خضراء (شغل الصيدلية)
+            previewHtml = `<div style="height:120px; background:#eafaf1; color:#27ae60; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                <span style="font-size:50px;">📊</span>
+                <span style="font-size:10px; font-weight:bold; margin-top:5px; color:#27ae60;">EXCEL SHEET</span>
+            </div>`;
+        } else if (type.includes('word') || name.endsWith('.doc') || name.endsWith('.docx')) {
+            // Word: أيقونة زرقاء
+            previewHtml = `<div style="height:120px; background:#ebf5fb; color:#2980b9; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                <span style="font-size:50px;">📝</span>
+                <span style="font-size:10px; font-weight:bold; margin-top:5px; color:#2980b9;">WORD DOC</span>
+            </div>`;
+        } else if (name.endsWith('.html') || name.endsWith('.css') || name.endsWith('.js') || name.endsWith('.json')) {
+            // ملفات البرمجة (Code)
+            previewHtml = `<div style="height:120px; background:#f4ecf7; color:#8e44ad; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                <span style="font-size:50px;">💻</span>
+                <span style="font-size:10px; font-weight:bold; margin-top:5px; color:#8e44ad;">SOURCE CODE</span>
+            </div>`;
+        } else if (type.includes('text') || name.endsWith('.txt')) {
+            // ملفات نصية بسيطة
+            previewHtml = `<div style="height:120px; background:#f8f9f9; color:#7f8c8d; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                <span style="font-size:50px;">📄</span>
+                <span style="font-size:10px; font-weight:bold; margin-top:5px; color:#7f8c8d;">TEXT FILE</span>
+            </div>`;
+        } else {
+            // أي نوع ملف آخر غير معروف
+            previewHtml = `<div style="height:120px; background:#fef9e7; color:#f1c40f; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                <span style="font-size:50px;">📦</span>
+                <span style="font-size:10px; font-weight:bold; margin-top:5px; color:#f39c12;">OTHER FILE</span>
+            </div>`;
+        }
+
+        card.innerHTML = `
+            <div class="card-actions">
+                <button class="action-btn" style="background:rgba(255,255,255,0.8)" onclick="deleteFile('${f.id}')">🗑️</button>
+            </div>
+
+            ${previewHtml}
+
+            <h3 style="font-size:13px; margin:12px 0 5px 0; word-break:break-all; text-align:left; height:34px; overflow:hidden; color:var(--dark-blue); line-height:1.3;">
+                ${f.file_name}
+            </h3>
+
+            <p style="font-size:10px; color:#999; margin-bottom:15px;">Size: ${(f.file_size/1024).toFixed(1)} KB</p>
+
+            <div style="margin-top:auto; display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                <button class="auth-btn" style="padding:10px; font-size:12px; background:var(--dark-blue);" onclick="viewFile('${f.file_url}', '${f.file_type}')">View 👁️</button>
+                <a href="${f.file_url}" download="${f.file_name}" target="_blank" style="text-decoration:none;">
+                    <button class="auth-btn" style="padding:10px; font-size:12px; width:100%; background:var(--orange);">Get 📥</button>
+                </a>
+            </div>
+        `;
+        row.appendChild(card);
+    });
+    layout.appendChild(row);
+}
+function viewFile(url, type) {
+    const lb = document.getElementById('lightbox');
+    if (type.includes('image') || type.includes('video')) {
+        zoom(url, type.includes('video') ? 'v' : 'i');
+    } else {
+        // عرض الـ PDF والملفات الأخرى في iframe
+        lb.innerHTML = `<div style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center;">
+            <button class="auth-btn" style="width:auto; margin:10px;" onclick="document.getElementById('lightbox').style.display='none'">Close ❌</button>
+            <iframe src="${url}" style="width:95%; height:85%; border:none; background:white; border-radius:15px;"></iframe>
+        </div>`;
+        lb.style.display = 'flex';
+    }
+}
+// استبدل دالة deleteFile القديمة بهذي
+function deleteFile(id) {
+    // نستخدم الـ Art Modal الموحد اللي عملناه للأذكار
+    openArtModal(
+        "حذف الملف نهائياً؟",
+        "🗑️",
+        "",
+        "confirm_delete", // قيمة وهمية للتمييز
+        async () => {
+            const { error } = await _supabase.from('my_files').delete().eq('id', id);
+            if (!error) {
+                fetchFiles();
+                if (typeof Android !== 'undefined') Android.showToast("تم الحذف بنجاح");
+            }
+        }
+    );
+
+    // تعديل بسيط: نخفي الإدخال في حالة المسح
+    document.getElementById('artModalInput').style.display = 'none';
+    document.getElementById('artModalConfirm').style.background = '#e74c3c';
+    document.getElementById('artModalConfirm').innerText = 'تأكيد الحذف';
+}
 </script>
 </body>
 </html>
