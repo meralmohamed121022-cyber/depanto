@@ -8,122 +8,55 @@
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-        :root {
-            --dark-blue: #001f3f; --orange: #ff851b; --white: #ffffff;
-            --paper: #fdfcf0; --book-spine: #00152b; --glass: rgba(255, 255, 255, 0.1);
-        }
-
-        body {
-            background-color: var(--dark-blue); margin: 0;
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            display: flex; flex-direction: column; align-items: center;
-            min-height: 100vh; color: var(--white); overflow-x: hidden;
-            direction: ltr;
-        }
-
-        /* --- Auth UI --- */
-        #auth-container {
-            margin-top: 5vh; background: var(--white); padding: 30px;
-            border-radius: 20px; box-shadow: 10px 10px 0px var(--orange);
-            width: 85%; max-width: 380px; color: #333; text-align: center; border: 3px solid var(--book-spine);
-        }
+        :root { --dark-blue: #001f3f; --orange: #ff851b; --white: #ffffff; --paper: #fdfcf0; --book-spine: #00152b; --glass: rgba(255, 255, 255, 0.1); }
+        body { background-color: var(--dark-blue); margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: var(--white); overflow-x: hidden; direction: ltr; }
+        #auth-container { margin-top: 5vh; background: var(--white); padding: 30px; border-radius: 20px; box-shadow: 10px 10px 0px var(--orange); width: 85%; max-width: 380px; color: #333; text-align: center; border: 3px solid var(--book-spine); }
         .auth-tabs { display: flex; margin-bottom: 20px; background: #eee; border-radius: 50px; padding: 4px; }
         .auth-tab { flex: 1; padding: 10px; cursor: pointer; border-radius: 50px; font-weight: bold; font-size: 14px; }
         .auth-tab.active { background: var(--orange); color: white; }
         .auth-input { width: 100%; padding: 14px; margin-bottom: 12px; border: 2px solid #ddd; border-radius: 12px; outline: none; font-size: 16px; display: block; }
-        .auth-btn { background: var(--dark-blue); color: white; border: none; width: 100%; padding: 14px; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 16px; }
-
-        /* --- App UI --- */
+        .auth-btn { background: var(--dark-blue); color: white; border: none; width: 100%; padding: 14px; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s; }
+        .auth-btn:disabled { opacity: 0.6; cursor: not-allowed; background: #555; }
         #journal-app { display: none; width: 100%; flex-direction: column; align-items: center; }
         .top-bar { width: 92%; display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
-        .avatar-word {
-            background: var(--orange); color: white; padding: 8px 18px; border-radius: 30px;
-            font-weight: bold; font-size: 15px; border: 2px solid white;
-            animation: bounce 2.5s infinite ease-in-out; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            text-transform: uppercase;
-        }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        .logout-btn { background: none; border: 1px solid white; color: white; padding: 6px 15px; border-radius: 20px; cursor: pointer; font-size: 12px; }
+        .avatar-word { font-weight: bold; font-size: 24px; text-transform: uppercase; display: flex; align-items: center; gap: 4px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); padding: 5px; }
+        .animated-letter { display: inline-block; animation: dropBounce 2s infinite ease-in; position: relative; }
+        @keyframes dropBounce { 0% { transform: translateY(-60px); opacity: 0; } 30% { transform: translateY(0); opacity: 1; } 50% { transform: translateY(-25px); } 70% { transform: translateY(0); } 85% { transform: translateY(-10px); } 100% { transform: translateY(0); } }
         .search-box { width: 90%; max-width: 600px; padding: 12px 20px; border-radius: 50px; border: 2px solid var(--orange); background: var(--glass); color: white; margin: 15px 0; outline: none; }
-
         .nav-tabs { margin-bottom: 20px; display: flex; gap: 10px; }
         .tab-btn { background: transparent; border: 2px solid var(--orange); color: white; padding: 8px 25px; border-radius: 50px; cursor: pointer; font-size: 14px; }
         .tab-btn.active { background: var(--orange); box-shadow: 0 0 10px var(--orange); }
-
-        /* --- Form UI --- */
-        .glass-input {
-            background: var(--white); padding: 20px; border-radius: 20px;
-            width: 90%; max-width: 600px; box-shadow: 10px 10px 0px var(--orange);
-            border: 3px solid var(--book-spine); color: #333; margin-bottom: 30px;
-        }
+        .glass-input { background: var(--white); padding: 20px; border-radius: 20px; width: 90%; max-width: 600px; box-shadow: 10px 10px 0px var(--orange); border: 3px solid var(--book-spine); color: #333; margin-bottom: 30px; }
         .glass-input input, .glass-input textarea { width: 100%; border: 1px solid #eee; border-radius: 10px; padding: 12px; margin-bottom: 10px; font-size: 16px; }
         .datetime-row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
         .datetime-row div { flex: 1; }
         .today-btn { background: var(--orange); color: white; border: none; padding: 10px; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 12px; }
         .file-upload-art { border: 2px dashed var(--orange); background: #fffbf5; padding: 15px; border-radius: 10px; text-align: center; cursor: pointer; margin-bottom: 10px; font-size: 14px; color: #666; }
-
-        /* --- Journal Grid & Gallery --- */
         .day-header { background: var(--orange); color: white; padding: 8px 25px; border-radius: 0 30px 30px 0; margin: 15px 0; font-weight: bold; align-self: flex-end; margin-right: 5%; }
-        .journal-row {
-            display: flex; gap: 20px; padding: 15px 20px 35px 20px;
-            overflow-x: auto; width: 100%; scroll-snap-type: x mandatory; direction: rtl;
-        }
-        .journal-row::-webkit-scrollbar { height: 8px; }
-        .journal-row::-webkit-scrollbar-thumb { background: var(--orange); border-radius: 10px; }
-
-        .note-card {
-            min-width: 290px; max-width: 290px; background: var(--paper); color: #333;
-            padding: 20px; border-radius: 5px 20px 20px 5px; box-shadow: 5px 5px 15px rgba(0,0,0,0.3);
-            border-right: 12px solid var(--book-spine); scroll-snap-align: center; display: flex; flex-direction: column; position: relative; direction: ltr;
-        }
-        .card-actions { position: absolute; top: 8px; left: 8px; display: flex; gap: 10px; z-index: 10; }
-        .action-btn { border: none; background: rgba(255,255,255,0.8); padding: 5px; border-radius: 5px; cursor: pointer; font-size: 16px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-
-        /* معرض الصور داخل الكارت */
-        .media-gallery {
-            display: flex; gap: 10px; overflow-x: auto; margin: 12px 0;
-            scroll-snap-type: x mandatory; padding-bottom: 5px;
-        }
-        .media-gallery::-webkit-scrollbar { height: 4px; }
-        .gallery-item {
-            flex: 0 0 85%; /* يظهر 85% من الصورة و15% من التالية */
-            height: 180px; border-radius: 12px; object-fit: cover;
-            scroll-snap-align: start; background: #eee; border: 1px solid #ddd;
-        }
-
-        /* --- Modal Styling (Final Fix) --- */
-        .modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.92); display: none; z-index: 99999;
-            overflow-y: auto; padding: 40px 0; -webkit-overflow-scrolling: touch;
-        }
-        .modal-content {
-            background: white; padding: 25px; border-radius: 20px;
-            width: 90%; max-width: 420px; margin: 0 auto; color: #333;
-            box-shadow: 0 15px 50px rgba(0,0,0,0.8); position: relative; text-align: center;
-        }
+        .journal-row { display: flex; gap: 20px; padding: 15px 20px 35px 20px; overflow-x: auto; width: 100%; scroll-snap-type: x mandatory; direction: rtl; }
+        .note-card { min-width: 290px; max-width: 290px; background: var(--paper); color: #333; padding: 20px; border-radius: 5px 20px 20px 5px; box-shadow: 5px 5px 15px rgba(0,0,0,0.3); border-right: 12px solid var(--book-spine); scroll-snap-align: center; display: flex; flex-direction: column; position: relative; direction: ltr; }
+        .card-actions { position: absolute; top: 8px; left: 8px; display: flex; gap: 8px; z-index: 10; }
+        .action-btn { border: none; background: rgba(255,255,255,0.8); padding: 5px; border-radius: 5px; cursor: pointer; font-size: 16px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
+        .stop-alarm-small { background: #ff4444 !important; color: white !important; display: none; animation: pulse-red 1s infinite; }
+        .stop-alarm-small.stopped { background: #2ecc71 !important; animation: none; transform: scale(0.9); }
+        @keyframes pulse-red { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        .media-gallery { display: flex; gap: 10px; overflow-x: auto; margin: 12px 0; scroll-snap-type: x mandatory; padding-bottom: 5px; }
+        .gallery-item { flex: 0 0 85%; height: 180px; border-radius: 12px; object-fit: cover; scroll-snap-align: start; background: #eee; border: 1px solid #ddd; }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); display: none; z-index: 99999; overflow-y: auto; padding: 40px 0; -webkit-overflow-scrolling: touch; }
+        .modal-content { background: white; padding: 25px; border-radius: 20px; width: 90%; max-width: 420px; margin: 0 auto; color: #333; box-shadow: 0 15px 50px rgba(0,0,0,0.8); position: relative; text-align: center; }
         .alert-btns { display: flex; gap: 10px; margin-top: 20px; }
         .alert-btn { flex: 1; padding: 14px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 16px; }
-
-        /* تعديل الميديا في الـ Modal */
-        .edit-media-preview {
-            display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; margin-bottom: 15px;
-        }
+        .edit-media-preview { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; margin-bottom: 15px; }
         .preview-wrapper { position: relative; flex: 0 0 100px; height: 100px; }
         .preview-wrapper img, .preview-wrapper video { width: 100%; height: 100%; border-radius: 10px; object-fit: cover; }
-        .remove-media-btn {
-            position: absolute; top: -5px; right: -5px; background: #ff4444; color: white;
-            border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-weight: bold;
-        }
-
+        .remove-media-btn { position: absolute; top: -5px; right: -5px; background: #ff4444; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-weight: bold; }
         #lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; justify-content: center; align-items: center; z-index: 100000; }
         #lightbox img, #lightbox video { max-width: 95%; max-height: 85%; border-radius: 5px; border: 2px solid white; }
-
-        /* Countdown & Alarm */
         .countdown-timer { font-size: 11px; font-weight: bold; color: #d35400; margin-top: 4px; background: #fff0e0; padding: 2px 8px; border-radius: 4px; display: inline-block; border: 1px solid #ffcc99; }
         @keyframes alarm-pulse { from { transform: scale(1); box-shadow: 0 0 10px var(--orange); } to { transform: scale(1.05); box-shadow: 0 0 30px var(--orange); } }
         .alarm-active { animation: alarm-pulse 0.5s infinite alternate; }
+        .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; margin-right: 8px; vertical-align: middle; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -136,29 +69,26 @@
     </div>
     <input type="text" id="auth-user" class="auth-input" placeholder="Username">
     <input type="password" id="auth-pass" class="auth-input" placeholder="Password">
-    <button class="auth-btn" id="auth-btn" onclick="handleAuth()">Enter ✨</button>
+    <button class="auth-btn" onclick="handleAuth()">Enter ✨</button>
 </div>
 
 <div id="journal-app">
     <div class="top-bar">
         <div class="user-profile"><div class="avatar-word" id="user-avatar-text">NAME</div></div>
-        <button class="logout-btn" onclick="logout()">Logout</button>
+        <button class="auth-btn" style="padding:6px 15px; font-size:12px; width:auto;" onclick="logout()">Logout</button>
     </div>
-
     <input type="text" id="fuzzySearch" class="search-box" placeholder="Search notes...">
-
     <div class="nav-tabs">
         <button id="tabActive" class="tab-btn active" onclick="changeView('active')">My Notes</button>
         <button id="tabHistory" class="tab-btn" onclick="changeView('history')">Archive</button>
     </div>
-
     <div class="glass-input" id="entryForm">
         <input type="text" id="noteTitle" placeholder="Note Title">
         <textarea id="noteText" rows="3" placeholder="What's on your mind?"></textarea>
         <div class="datetime-row">
             <div><label style="font-size:10px;">Date</label><input type="date" id="noteDate"></div>
             <div><label style="font-size:10px;">Time</label><input type="time" id="noteTime"></div>
-            <button class="today-btn" onclick="setToday()">Today</button>
+            <button class="auth-btn" style="width:auto; padding:5px 15px;" onclick="setToday()">Today</button>
         </div>
         <div class="file-upload-art" onclick="document.getElementById('noteFile').click()">
             <span id="fileLabel">Attach Media 🖼️</span>
@@ -166,7 +96,6 @@
         </div>
         <button id="mainSaveBtn" class="auth-btn" onclick="handleSave()">Save Now ✨</button>
     </div>
-
     <div id="notesLayout" style="width: 100%;"></div>
 </div>
 
@@ -182,40 +111,15 @@
     </div>
 </div>
 
-<!-- Modal التنبيهات -->
-<div id="alertModal" class="modal">
-    <div class="modal-content">
-        <h3 id="alertTitle" style="margin-top:0;">Alert</h3>
-        <p id="alertMsg"></p>
-        <button class="auth-btn" onclick="this.parentElement.parentElement.style.display='none'">OK</button>
-    </div>
-</div>
-
 <!-- Modal التعديل -->
 <div id="editModal" class="modal">
     <div class="modal-content">
         <h3 style="margin-top:0;">Edit Entry ✏️</h3>
         <input type="text" id="editTitle" class="auth-input">
         <textarea id="editText" rows="5" class="auth-input"></textarea>
-
-        <div style="display:flex; gap:10px; margin-bottom:10px;">
-            <div style="flex:1; text-align:left;">
-                <label style="font-size:12px; font-weight:bold; color:var(--dark-blue)">Date</label>
-                <input type="date" id="editDate" class="auth-input">
-            </div>
-            <div style="flex:1; text-align:left;">
-                <label style="font-size:12px; font-weight:bold; color:var(--dark-blue)">Time</label>
-                <input type="time" id="editTime" class="auth-input">
-            </div>
-        </div>
-
+        <div style="display:flex; gap:10px; margin-bottom:10px;"><div style="flex:1; text-align:left;"><label style="font-size:12px; font-weight:bold; color:var(--dark-blue)">Date</label><input type="date" id="editDate" class="auth-input"></div><div style="flex:1; text-align:left;"><label style="font-size:12px; font-weight:bold; color:var(--dark-blue)">Time</label><input type="time" id="editTime" class="auth-input"></div></div>
         <div id="currentEditGallery" class="edit-media-preview"></div>
-
-        <div class="file-upload-art" onclick="document.getElementById('editFile').click()">
-            <span id="editFileLabel">Add New Media ➕</span>
-            <input type="file" id="editFile" hidden onchange="handleNewEditFile()">
-        </div>
-
+        <div class="file-upload-art" onclick="document.getElementById('editFile').click()"><span id="editFileLabel">Add New Media ➕</span><input type="file" id="editFile" hidden onchange="handleNewEditFile()"></div>
         <button id="updateBtn" class="auth-btn" onclick="updateNote()">Save Changes</button>
         <button class="auth-btn" style="background:#eee; color:#333; margin-top:10px;" onclick="closeModal()">Cancel</button>
     </div>
@@ -227,125 +131,49 @@
         <h2 style="color: var(--orange); margin-top:0;">⏰ Time's Up!</h2>
         <h3 id="alarmNoteTitle">Note Title</h3>
         <p id="alarmNoteContent" style="max-height: 150px; overflow-y: auto; font-size: 14px;"></p>
-        <button class="auth-btn" style="background: var(--orange);" onclick="stopAlarm()">Stop Alarm 🔕</button>
+        <button id="stopAlarmBtn" class="auth-btn" style="background: var(--orange);" onclick="stopAlarmUI(event)">Stop Alarm ✅</button>
     </div>
 </div>
 
 <audio id="alarmAudio" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto" loop></audio>
-
 <div id="lightbox" onclick="this.style.display='none'"></div>
 
 <script>
-    const SB_URL = "https://ixzuotmqgdnlrkalwyyg.supabase.co";
-    const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4enVvdG1xZ2RubHJrYWx3eXlnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1NDAwMTQsImV4cCI6MjA5MTExNjAxNH0.NrU4rKVfrHWB0x220iIGzr-aXGm_5EljV4CCoYFnojo";
+    const SB_URL = "https://ixzuotmqgdnlrkalwyyg.supabase.co", SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4enVvdG1xZ2RubHJrYWx3eXlnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1NDAwMTQsImV4cCI6MjA5MTExNjAxNH0.NrU4rKVfrHWB0x220iIGzr-aXGm_5EljV4CCoYFnojo";
     const _supabase = supabase.createClient(SB_URL, SB_KEY);
+    let currentView = 'active', rawData = [], currentUser = localStorage.getItem('mo_user'), isAlarmActive = false, editingId = null, currentAlarmingNoteId = null, tempEditMedia = [], autoplayHandler = null;
 
-    let currentView = 'active', rawData = [], currentUser = localStorage.getItem('mo_user'), editId = null, tempEditMedia = [];
-
-    function setToday() {
-        const n = new Date();
-        const year = n.getFullYear();
-        const month = String(n.getMonth() + 1).padStart(2, '0');
-        const day = String(n.getDate()).padStart(2, '0');
-        document.getElementById('noteDate').value = `${year}-${month}-${day}`;
-        document.getElementById('noteTime').value = n.toTimeString().slice(0,5);
-    }
-    function setMode(m) {
-        document.getElementById('auth-title').innerText = m === 'login' ? "Mo's Vault 🔒" : "Join the Vault ✨";
-        document.getElementById('auth-btn').innerText = m === 'login' ? 'Enter ✨' : 'Register ✨';
-        document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-        document.getElementById('tab-'+m).classList.add('active');
-        window.authMode = m;
-    }
-
-    async function handleAuth() {
-        const u = document.getElementById('auth-user').value, p = document.getElementById('auth-pass').value;
-        if(!u || !p) return showCustomAlert("Wait", "Fill all fields!");
-        if(window.authMode === 'register') {
-            const { error } = await _supabase.from('journal_users').insert([{ username: u, password: p }]);
-            if(error) showCustomAlert("Error", "Taken!"); else showCustomAlert("Success", "Login now!");
-        } else {
-            const { data } = await _supabase.from('journal_users').select('*').eq('username', u).eq('password', p).single();
-            if(data) { localStorage.setItem('mo_user', u); location.reload(); } else showCustomAlert("Error", "Denied!");
-        }
-    }
-
-    async function uploadFile(file) {
-        if(!file) return null;
-        const name = `${Date.now()}_${file.name}`;
-        const { data, error } = await _supabase.storage.from('media').upload(name, file);
-        return error ? null : _supabase.storage.from('media').getPublicUrl(name).data.publicUrl;
-    }
+    function setToday() { const n = new Date(); document.getElementById('noteDate').value = n.toISOString().split('T')[0]; document.getElementById('noteTime').value = n.toTimeString().slice(0,5); }
+    function setMode(m) { document.getElementById('tab-login').classList.toggle('active', m==='login'); document.getElementById('tab-register').classList.toggle('active', m==='register'); window.authMode = m; }
+    async function handleAuth() { const u = document.getElementById('auth-user').value, p = document.getElementById('auth-pass').value; if(window.authMode === 'register') { await _supabase.from('journal_users').insert([{ username: u, password: p }]); location.reload(); } else { const { data } = await _supabase.from('journal_users').select('*').eq('username', u).eq('password', p).single(); if(data) { localStorage.setItem('mo_user', u); location.reload(); } } }
+    async function uploadFile(file) { if(!file) return null; const name = `${Date.now()}_${file.name}`; await _supabase.storage.from('media').upload(name, file); return _supabase.storage.from('media').getPublicUrl(name).data.publicUrl; }
 
     async function handleSave() {
-        const content = document.getElementById('noteText').value;
-        if(!content) return showCustomAlert("Empty", "Write something!");
-        const btn = document.getElementById('mainSaveBtn');
-        btn.disabled = true; btn.innerText = "Saving...";
-        const file = document.getElementById('noteFile').files[0];
-        const url = await uploadFile(file);
-        const d = document.getElementById('noteDate').value, t = document.getElementById('noteTime').value;
-
-        let reminder = null;
-        if (d) {
-            // إنشاء تاريخ محلي بناءً على المدخلات
-            const localDate = t ? new Date(`${d}T${t}`) : new Date(`${d}T00:00:00`);
-            reminder = localDate.toISOString(); // تحويله لـ UTC بشكل صحيح للإرسال
-        }
-
-        await _supabase.from('notes').insert([{ title: document.getElementById('noteTitle').value || "Untitled", content, media_url: url, owner_name: currentUser, reminder_at: reminder, is_completed: false }]);
-        location.reload();
+        const titleInput = document.getElementById('noteTitle'), contentInput = document.getElementById('noteText'), saveBtn = document.getElementById('mainSaveBtn');
+        if(!contentInput.value.trim()) return; saveBtn.disabled = true; saveBtn.innerText = "Saving... ⏳";
+        try {
+            const d = document.getElementById('noteDate').value, t = document.getElementById('noteTime').value, reminder = d ? (new Date(`${d}T${t || '00:00'}`)) : null;
+            if(reminder && typeof Android !== 'undefined') Android.scheduleAlarm(titleInput.value || "Untitled", contentInput.value.substring(0,50), reminder.getTime());
+            const file = document.getElementById('noteFile').files[0], url = await uploadFile(file);
+            await _supabase.from('notes').insert([{ title: titleInput.value || "Untitled", content: contentInput.value, media_url: url, owner_name: currentUser, reminder_at: reminder ? reminder.toISOString() : null, is_completed: false, alarm_stopped: false }]);
+            location.reload();
+        } catch(err) { alert("Save failed: " + err.message); saveBtn.disabled = false; saveBtn.innerText = "Save Now ✨"; }
     }
 
-    async function fetchNotes() {
-        const { data } = await _supabase.from('notes').select('*').eq('owner_name', currentUser).eq('is_completed', currentView === 'history').order('created_at', {ascending: false});
-        rawData = data || [];
-        renderStructure(rawData);
-    }
+    async function fetchNotes() { const { data } = await _supabase.from('notes').select('*').eq('owner_name', currentUser).eq('is_completed', currentView === 'history').order('created_at', {ascending: false}); rawData = data || []; renderStructure(rawData); }
 
     function renderStructure(notes) {
         const layout = document.getElementById('notesLayout'); layout.innerHTML = '';
-        const groups = notes.reduce((acc, n) => {
-            const d = n.reminder_at ? new Date(n.reminder_at) : new Date(n.created_at);
-            const day = d.toLocaleDateString('en-US', {weekday:'long', day:'numeric', month:'long'});
-            if(!acc[day]) acc[day] = []; acc[day].push(n); return acc;
-        }, {});
-
+        const groups = notes.reduce((acc, n) => { const d = n.reminder_at ? new Date(n.reminder_at) : new Date(n.created_at); const day = d.toLocaleDateString('en-US', {weekday:'long', day:'numeric', month:'long'}); if(!acc[day]) acc[day] = []; acc[day].push(n); return acc; }, {});
         for (const day in groups) {
-            const section = document.createElement('div');
-            section.innerHTML = `<div class="day-header">${day}</div>`;
+            const section = document.createElement('div'); section.innerHTML = `<div class="day-header">${day}</div>`;
             const row = document.createElement('div'); row.className = 'journal-row';
             groups[day].forEach(n => {
-                const card = document.createElement('div'); card.className = 'note-card';
-                card.id = `note-${n.id}`;
-                // معالجة تعدد الميديا
+                const card = document.createElement('div'); card.className = 'note-card'; card.id = `note-${n.id}`;
                 const urls = n.media_url ? n.media_url.split('||') : [];
-                let galleryHtml = '';
-                if(urls.length > 0) {
-                    galleryHtml = `<div class="media-gallery">`;
-                    urls.forEach(u => {
-                        if(u.match(/\.(mp4|webm|ogg)$/i)) galleryHtml += `<video src="${u}" class="gallery-item" onclick="zoom('${u}','v')"></video>`;
-                        else galleryHtml += `<img src="${u}" class="gallery-item" onclick="zoom('${u}','i')">`;
-                    });
-                    galleryHtml += `</div>`;
-                }
-
-                const countdownHtml = n.reminder_at && !n.is_completed ? `<div class="countdown-timer" id="timer-${n.id}" data-time="${n.reminder_at}">Calculating...</div>` : '';
-
-                card.innerHTML = `
-                    <div class="card-actions">
-                        <button class="action-btn" onclick="openEdit('${n.id}')">✏️</button>
-                        <button class="action-btn" onclick="askDelete('${n.id}')">🗑️</button>
-                    </div>
-                    <div style="font-size:10px; opacity:0.5; margin-top:15px; display:flex; justify-content:space-between; align-items:center;">
-                        <span>${n.reminder_at ? new Date(n.reminder_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : 'New'}</span>
-                        ${countdownHtml}
-                    </div>
-                    <h3 style="margin:5px 0;">${n.title}</h3>
-                    ${galleryHtml}
-                    <p style="white-space: pre-wrap; flex-grow:1; font-size:14px;">${n.content}</p>
-                    ${!n.is_completed ? `<button onclick="markDone('${n.id}')" style="background:var(--orange); border:none; color:white; padding:10px; border-radius:8px; width:100%; margin-top:10px; font-weight:bold;">Archive ✅</button>` : ''}
-                `;
+                let galleryHtml = urls.length > 0 ? `<div class="media-gallery">` + urls.map(u => u.match(/\.(mp4|webm|ogg)$/i) ? `<video src="${u}" class="gallery-item" onclick="zoom('${u}','v')"></video>` : `<img src="${u}" class="gallery-item" onclick="zoom('${u}','i')">`).join('') + `</div>` : '';
+                const countdownHtml = n.reminder_at && !n.is_completed && !n.alarm_stopped ? `<div class="countdown-timer" id="timer-${n.id}" data-time="${n.reminder_at}">...</div>` : '';
+                card.innerHTML = `<div class="card-actions"><button class="action-btn" onclick="openEdit('${n.id}')">✏️</button><button class="action-btn" onclick="askDelete('${n.id}')">🗑️</button><button class="action-btn stop-alarm-small" id="stop-btn-${n.id}" onclick="stopAlarmUI(event, '${n.id}')">🔕</button></div><div style="font-size:10px; opacity:0.5; margin-top:15px; display:flex; justify-content:space-between; align-items:center;"><span>${n.reminder_at ? new Date(n.reminder_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : ''}</span>${countdownHtml}</div><h3 style="margin:5px 0;">${n.title}</h3>${galleryHtml}<p style="white-space: pre-wrap; flex-grow:1; font-size:14px;">${n.content}</p>${!n.is_completed ? `<button onclick="markDone('${n.id}', this)" style="background:var(--orange); border:none; color:white; padding:12px; border-radius:8px; width:100%; margin-top:10px; font-weight:bold; display:flex; align-items:center; justify-content:center; transition:0.3s;">Archive ✅</button>` : ''}`;
                 row.appendChild(card);
             });
             section.appendChild(row); layout.appendChild(section);
@@ -353,179 +181,86 @@
         updateAllCountdowns();
     }
 
-    function openEdit(id) {
-        const note = rawData.find(n => n.id === id);
-        editId = id;
-        tempEditMedia = note.media_url ? note.media_url.split('||') : [];
-        document.getElementById('editTitle').value = note.title;
-        document.getElementById('editText').value = note.content;
-        if(note.reminder_at) {
-            const parts = note.reminder_at.split('T');
-            document.getElementById('editDate').value = parts[0];
-            document.getElementById('editTime').value = parts[1] ? parts[1].slice(0,5) : '';
-        } else {
-            document.getElementById('editDate').value = '';
-            document.getElementById('editTime').value = '';
-        }
-        renderEditGallery();
-        document.getElementById('editModal').style.display = 'block';
-    }
-
-    function renderEditGallery() {
-        const gallery = document.getElementById('currentEditGallery');
-        gallery.innerHTML = '';
-        tempEditMedia.forEach((u, index) => {
-            const div = document.createElement('div'); div.className = 'preview-wrapper';
-            const media = u.match(/\.(mp4|webm|ogg)$/i) ? `<video src="${u}"></video>` : `<img src="${u}">`;
-            div.innerHTML = `${media}<button class="remove-media-btn" onclick="removeMedia(${index})">×</button>`;
-            gallery.appendChild(div);
-        });
-    }
-
-    function removeMedia(index) { tempEditMedia.splice(index, 1); renderEditGallery(); }
-
-    async function handleNewEditFile() {
-        const file = document.getElementById('editFile').files[0];
-        if(!file) return;
-        document.getElementById('editFileLabel').innerText = "Uploading...";
-        const url = await uploadFile(file);
-        if(url) { tempEditMedia.push(url); renderEditGallery(); }
-        document.getElementById('editFileLabel').innerText = "Add New Media ➕";
-    }
-
-    async function updateNote() {
-        const btn = document.getElementById('updateBtn'); btn.disabled = true; btn.innerText = "Saving...";
-        const finalMediaStr = tempEditMedia.join('||');
-        const d = document.getElementById('editDate').value, t = document.getElementById('editTime').value;
-
-        let reminder = null;
-        if (d) {
-            const localDate = t ? new Date(`${d}T${t}`) : new Date(`${d}T00:00:00`);
-            reminder = localDate.toISOString();
-        }
-
-        await _supabase.from('notes').update({
-            title: document.getElementById('editTitle').value,
-            content: document.getElementById('editText').value,
-            media_url: finalMediaStr,
-            reminder_at: reminder
-        }).eq('id', editId);
-        location.reload();
-    }
-
-    // --- Countdown & Alarm Logic ---
-    let activeAlarms = new Set();
-    let vibrationInterval = null;
-    let isAlarmActive = false;
-
     function updateAllCountdowns() {
-        if (isAlarmActive) return; // Stop checking if an alarm is already ringing
+        if(editingId) return;
         document.querySelectorAll('.countdown-timer').forEach(el => {
-            const target = new Date(el.dataset.time).getTime();
-            const now = new Date().getTime();
-            const diff = target - now;
-
-            if (diff <= 0) {
-                el.innerText = "Due!";
-                el.style.color = "red";
-                const noteId = el.id.replace('timer-', '');
-                if (diff > -60000) {
-                    triggerAlarm(noteId);
-                }
-            } else {
-                const hours = Math.floor(diff / (1000 * 60 * 60));
-                const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const secs = Math.floor((diff % (1000 * 60)) / 1000);
-                el.innerText = `${hours}h ${mins}m ${secs}s`;
-            }
+            const target = new Date(el.dataset.time).getTime(), now = new Date().getTime(), diff = target - now, noteId = el.id.replace('timer-', ''), smallStopBtn = document.getElementById(`stop-btn-${noteId}`);
+            if (diff <= 0) { el.innerText = "Due!"; el.style.color = "red"; if(smallStopBtn && !smallStopBtn.classList.contains('stopped')) smallStopBtn.style.display = 'flex'; if (diff > -60000 && !isAlarmActive) triggerAlarm(noteId); }
+            else { if(smallStopBtn) smallStopBtn.style.display = 'none'; el.innerText = `${Math.floor(diff/3600000)}h ${Math.floor((diff%3600000)/60000)}m ${Math.floor((diff%60000)/1000)}s`; }
         });
     }
 
     function triggerAlarm(id) {
-        if (isAlarmActive || activeAlarms.has(id)) return;
         const note = rawData.find(n => n.id == id);
-        if (!note || note.is_completed) return;
-
-        isAlarmActive = true;
-        activeAlarms.add(id);
-
+        if (!note || note.is_completed || note.alarm_stopped || isAlarmActive || editingId) return;
+        isAlarmActive = true; currentAlarmingNoteId = id;
         document.getElementById('alarmNoteTitle').innerText = note.title;
         document.getElementById('alarmNoteContent').innerText = note.content;
         document.getElementById('alarmModal').style.display = 'block';
 
-        const audio = document.getElementById('alarmAudio');
-        audio.currentTime = 0;
-        const playPromise = audio.play();
-
-        if (playPromise !== undefined) {
-            playPromise.catch(e => {
-                console.log("Audio play blocked");
-                document.body.addEventListener('click', () => audio.play(), { once: true });
-            });
+        // استدعاء صوت أندرويد الأصلي بدلاً من صوت المتصفح
+        if (typeof Android !== 'undefined' && Android.startAlarmSound) {
+            Android.startAlarmSound();
         }
 
-        // Start Vibration
-        if (navigator.vibrate) {
-            navigator.vibrate([500, 300, 500, 300, 500]);
-            if (vibrationInterval) clearInterval(vibrationInterval);
-            vibrationInterval = setInterval(() => {
-                if (isAlarmActive) navigator.vibrate([500, 300, 500, 300, 500]);
-                else clearInterval(vibrationInterval);
-            }, 2000);
-        }
+        if (navigator.vibrate) navigator.vibrate([500, 300, 500, 300, 500]);
     }
 
-    function stopAlarm() {
+    async function stopAlarmUI(event, id) {
+        if(event) { event.preventDefault(); event.stopPropagation(); }
+        const targetId = id || currentAlarmingNoteId; if(!targetId) return;
+
+        // إيقاف صوت أندرويد الأصلي
+        if (typeof Android !== 'undefined' && Android.stopAlarmSound) {
+            Android.stopAlarmSound();
+        }
+
+        const localNote = rawData.find(n => n.id == targetId); if(localNote) localNote.alarm_stopped = true;
         isAlarmActive = false;
+        try { await _supabase.from('notes').update({ alarm_stopped: true }).eq('id', targetId); } catch(e) {}
         document.getElementById('alarmModal').style.display = 'none';
-
-        const audio = document.getElementById('alarmAudio');
-        audio.pause();
-        audio.currentTime = 0;
-
-        if (vibrationInterval) {
-            clearInterval(vibrationInterval);
-            vibrationInterval = null;
-        }
         if (navigator.vibrate) navigator.vibrate(0);
+        const smallBtn = document.getElementById(`stop-btn-${targetId}`); if(smallBtn) { smallBtn.classList.add('stopped'); smallBtn.innerHTML = '✅'; smallBtn.style.background = '#2ecc71'; smallBtn.style.display = 'flex'; }
     }
 
-    // Stop alarm on Flip (face down) or significant movement
-    window.addEventListener('deviceorientation', (event) => {
-        if (isAlarmActive) {
-            const beta = event.beta; // rotation around X axis [-180, 180]
-            // If phone is face down (beta is around 180 or -180)
-            if (Math.abs(beta) > 160) {
-                stopAlarm();
+    window.addEventListener('deviceorientation', (e) => { if (isAlarmActive && Math.abs(e.beta) > 160) stopAlarmUI(); });
+    setInterval(updateAllCountdowns, 1000);
+    function openEdit(id) { const n = rawData.find(x => x.id == id); if(!n) return; stopAlarmUI(null, id); editingId = id; tempEditMedia = n.media_url ? n.media_url.split('||') : []; document.getElementById('editTitle').value = n.title; document.getElementById('editText').value = n.content; if(n.reminder_at) { const d = new Date(n.reminder_at); document.getElementById('editDate').value = d.toISOString().split('T')[0]; document.getElementById('editTime').value = d.toTimeString().slice(0,5); } renderEditGallery(); document.getElementById('editModal').style.display = 'block'; }
+    function renderEditGallery() { const g = document.getElementById('currentEditGallery'); g.innerHTML = ''; tempEditMedia.forEach((u, i) => { const d = document.createElement('div'); d.className = 'preview-wrapper'; d.innerHTML = `${u.match(/\.(mp4|webm|ogg)$/i) ? `<video src="${u}"></video>` : `<img src="${u}">`}<button class="remove-media-btn" onclick="removeMedia(${i})">×</button>`; g.appendChild(d); }); }
+    function removeMedia(i) { tempEditMedia.splice(i, 1); renderEditGallery(); }
+    async function handleNewEditFile() { const f = document.getElementById('editFile').files[0]; if(!f) return; const url = await uploadFile(f); if(url) { tempEditMedia.push(url); renderEditGallery(); } }
+    async function updateNote() { const b = document.getElementById('updateBtn'); b.disabled = true; b.innerText = "Updating... ⏳"; try { const m = tempEditMedia.join('||'), t = document.getElementById('editTitle').value, c = document.getElementById('editText').value, d = document.getElementById('editDate').value, tm = document.getElementById('editTime').value, r = d ? (new Date(`${d}T${tm || '00:00'}`)) : null; if(r && typeof Android !== 'undefined') Android.scheduleAlarm(t, c.substring(0,50), r.getTime()); await _supabase.from('notes').update({ title: t, content: c, media_url: m, reminder_at: r ? r.toISOString() : null, alarm_stopped: false }).eq('id', editingId); location.reload(); } catch(e) { alert("Update failed: " + e.message); b.disabled = false; b.innerText = "Save Changes"; } }
+    function logout() { localStorage.clear(); location.reload(); }
+    function zoom(u, t) { const lb = document.getElementById('lightbox'); lb.innerHTML = t==='v' ? `<video src="${u}" controls autoplay></video>` : `<img src="${u}">`; lb.style.display='flex'; }
+    function changeView(v) { currentView = v; document.getElementById('tabActive').classList.toggle('active', v === 'active'); document.getElementById('tabHistory').classList.toggle('active', v === 'history'); fetchNotes(); }
+    function closeModal() { document.getElementById('editModal').style.display='none'; editingId = null; }
+    async function markDone(id, btn) {
+        if(btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Archiving...';
+            btn.style.opacity = '0.7';
+        }
+        try {
+            await _supabase.from('notes').update({is_completed: true}).eq('id', id);
+            fetchNotes();
+        } catch(e) {
+            if(btn) {
+                btn.disabled = false;
+                btn.innerHTML = 'Archive ✅';
+                btn.style.opacity = '1';
             }
         }
-    });
-
-    // Stop alarm on any key press (volume etc)
-    window.addEventListener('keydown', () => {
-        if (isAlarmActive) stopAlarm();
-    });
-
-    setInterval(updateAllCountdowns, 1000);
-
-    function askDelete(id) { document.getElementById('confirmModal').style.display = 'block'; document.getElementById('finalDeleteBtn').onclick = async () => { await _supabase.from('notes').delete().eq('id', id); location.reload(); }; }
-    function closeConfirm() { document.getElementById('confirmModal').style.display = 'none'; }
-    async function markDone(id) { await _supabase.from('notes').update({is_completed: true}).eq('id', id); fetchNotes(); }
-    function closeModal() { document.getElementById('editModal').style.display = 'none'; }
-    function logout() { localStorage.clear(); location.reload(); }
-    function zoom(u, t) { const lb = document.getElementById('lightbox'); lb.innerHTML = t==='v' ? `<video src="${u}" controls autoplay></video>` : `<img src="${u}">`; lb.style.display = 'flex'; }
-    function changeView(v) { currentView = v; document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(v==='active'?'tabActive':'tabHistory').classList.add('active'); document.getElementById('entryForm').style.display = v==='history'?'none':'block'; fetchNotes(); }
-
-    document.getElementById('fuzzySearch').oninput = function() {
-        const term = this.value; if(!term) return renderStructure(rawData);
-        const fuse = new Fuse(rawData, { keys: ['title', 'content'], threshold: 0.4 });
-        renderStructure(fuse.search(term).map(r => r.item));
-    };
+    }
+    function askDelete(id) { document.getElementById('confirmModal').style.display='block'; document.getElementById('finalDeleteBtn').onclick=()=> { _supabase.from('notes').delete().eq('id', id).then(()=>location.reload()); }; }
+    function closeConfirm() { document.getElementById('confirmModal').style.display='none'; }
 
     if(currentUser) {
         document.getElementById('auth-container').style.display = 'none';
         document.getElementById('journal-app').style.display = 'flex';
-        document.getElementById('user-avatar-text').innerText = currentUser.charAt(0).toUpperCase();
+        const colors = ['#ff851b', '#2ecc71', '#3498db', '#9b59b6', '#f1c40f', '#e74c3c'];
+        let coloredName = ''; const firstName = currentUser.split(' ')[0];
+        for(let i=0; i < firstName.length; i++) coloredName += `<span class="${i===0?'animated-letter':''}" style="color:${colors[i%colors.length]}">${i===0?firstName[i].toUpperCase():firstName[i]}</span>`;
+        document.getElementById('user-avatar-text').innerHTML = coloredName;
         fetchNotes();
     } else { setMode('login'); }
 </script>
