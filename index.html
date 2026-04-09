@@ -2,15 +2,33 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Mo's Secure Journal 🔐</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         :root { --dark-blue: #001f3f; --orange: #ff851b; --white: #ffffff; --paper: #fdfcf0; --book-spine: #00152b; --glass: rgba(255, 255, 255, 0.1); }
-        body { background-color: var(--dark-blue); margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: var(--white); overflow-x: hidden; direction: ltr; }
+      /* إجبار الصفحة والـ body على ملء الشاشة بالكامل كقاعدة أساسية */
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
 
+body { 
+    background-color: var(--dark-blue); 
+    font-family: 'Segoe UI', Tahoma, sans-serif; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    min-height: 100%; /* غيرتها من 100vh لـ 100% عشان تمسك في الـ html */
+    color: var(--white); 
+    overflow-x: hidden; 
+    direction: ltr; 
+    position: relative; /* ضروري عشان الـ fixed lightbox ينسب للشاشة مش للمحتوى */
+}
         /* Auth Styles */
         #auth-container { margin-top: 5vh; background: var(--white); padding: 30px; border-radius: 20px; box-shadow: 10px 10px 0px var(--orange); width: 85%; max-width: 380px; color: #333; text-align: center; border: 3px solid var(--book-spine); }
         .auth-tabs { display: flex; margin-bottom: 20px; background: #eee; border-radius: 50px; padding: 4px; }
@@ -22,7 +40,15 @@
 
         /* App Layout */
         #journal-app { display: none; width: 100%; flex-direction: column; align-items: center; }
-        .top-bar { width: 92%; display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
+      
+/* وعدّل .top-bar كمان */
+.top-bar {
+    width: 92%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px; /* خففناه لأن الـ padding على الـ body شايله */
+}
         .avatar-word { font-weight: bold; font-size: 24px; text-transform: uppercase; display: flex; align-items: center; gap: 4px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); padding: 5px; }
         .animated-letter { display: inline-block; animation: dropBounce 2s infinite ease-in; position: relative; }
         @keyframes dropBounce { 0% { transform: translateY(-60px); opacity: 0; } 30% { transform: translateY(0); opacity: 1; } 50% { transform: translateY(-25px); } 70% { transform: translateY(0); } 85% { transform: translateY(-10px); } 100% { transform: translateY(0); } }
@@ -103,13 +129,109 @@
         .preview-wrapper { position: relative; flex: 0 0 100px; height: 100px; }
         .preview-wrapper img, .preview-wrapper video { width: 100%; height: 100%; border-radius: 10px; object-fit: cover; }
         .remove-media-btn { position: absolute; top: -5px; right: -5px; background: #ff4444; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-weight: bold; }
-        #lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; justify-content: center; align-items: center; z-index: 100000; }
-        #lightbox img, #lightbox video { max-width: 95%; max-height: 85%; border-radius: 5px; border: 2px solid white; }
-        .countdown-timer { font-size: 11px; font-weight: bold; color: #d35400; margin-top: 4px; background: #fff0e0; padding: 2px 8px; border-radius: 4px; display: inline-block; border: 1px solid #ffcc99; }
-        @keyframes alarm-pulse { from { transform: scale(1); box-shadow: 0 0 10px var(--orange); } to { transform: scale(1.05); box-shadow: 0 0 30px var(--orange); } }
-        .alarm-active { animation: alarm-pulse 0.5s infinite alternate; }
-        .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; margin-right: 8px; vertical-align: middle; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+  /* Lightbox الأساسي - ستارة تغطي الشاشة بالكامل */
+/* الحاوية الرئيسية للـ Lightbox */
+/* الحاوية الرئيسية للـ Lightbox */
+/* الحاوية الرئيسية - القمة في الهرم البرمجي */
+
+/* زر الإغلاق - وضعته فوق كل شيء */
+#lightbox .close-btn {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: white;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 100000001; 
+    transition: 0.3s ease;
+    user-select: none;
+    -webkit-user-select: none;
+    line-height: 1;
+    text-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+#lightbox .close-btn:hover {
+    color: #ff4d4d;
+    transform: scale(1.1);
+}
+
+/* --- الحل السحري للملفات والـ PDF --- */
+/* نلغي التوسط (Centering) عشان الـ iframe يفرش في الشاشة كلها */
+#lightbox-content {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* للصور */
+    justify-content: center; /* للصور */
+}
+/* ← استبدل الـ CSS القديم للـ lightbox بالكامل */
+#lightbox {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999999;
+    margin: 0; padding: 0;
+    background: #001f3f;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+/* ← احذف أي css يخص #lightbox iframe أو #lightbox img هنا */
+
+#lightbox iframe,
+#lightbox img,
+#lightbox video {
+    border: none;
+    display: block;
+}
+
+@media (max-width: 768px) {
+    #lightbox img, #lightbox video {
+        max-width: 100%;
+        max-height: 100%;
+    }
+}
+/* إضافة اختيارية: منع اختيار النص في كروت الأذكار أثناء السحب */
+.azkar-card {
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: pan-y; /* يسمح بالسكرول الرأسي فقط ويمنع تداخل السحب الجانبي */
+}
+/* ستايل التايمر */
+.countdown-timer {
+    font-size: 11px;
+    font-weight: bold;
+    color: #d35400;
+    margin-top: 4px;
+    background: #fff0e0;
+    padding: 2px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    border: 1px solid #ffcc99;
+}
+
+/* أنيميشن التنبيه */
+@keyframes alarm-pulse {
+    from { transform: scale(1); box-shadow: 0 0 10px var(--orange); }
+    to { transform: scale(1.05); box-shadow: 0 0 30px var(--orange); }
+}
+.alarm-active { animation: alarm-pulse 0.5s infinite alternate; }
+
+/* ستايل لودر التحميل */
+.spinner {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border: 3px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: var(--orange);
+    animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
         /* حاوية الذكر عشان تسمح بظهور اللي تحتها */
 .zikr-wrapper {
     position: relative;
@@ -269,6 +391,10 @@
 .note-card {
     transition: background 0.3s ease;
 }
+/* استبدل الـ CSS الموجود ده */
+body.is-android {
+    padding-top: max(env(safe-area-inset-top), 30px);
+}
     </style>
 </head>
 <body>
@@ -340,6 +466,14 @@
         </div>
 
         <div id="files-section" style="display:none; width: 100%; flex-direction: column; align-items: center;">
+
+            <div class="glass-input" style="margin-bottom: 15px; background: var(--dark-blue); border-color: var(--orange);">
+                <div class="file-upload-art" onclick="openTransfer()" style="border-style: dashed; background: rgba(255,133,27,0.1); color: var(--orange);">
+                    <span style="font-weight: bold; font-size: 16px;">🚀 Local Transfer (PC ↔ Mobile)</span>
+                    <p style="font-size: 10px; margin: 5px 0 0 0; opacity: 0.8;">Open IP: 192.168.8.149:5000</p>
+                </div>
+            </div>
+
             <div class="glass-input">
                 <div class="file-upload-art" onclick="document.getElementById('fileInputGeneral').click()" style="border-style: solid; background: #f0f7ff; color: var(--dark-blue);">
                     <span id="fileInputLabel">Upload Any File (PDF, Excel, Doc...) 📤</span>
@@ -349,6 +483,7 @@
                     Uploading to Vault... ⏳
                 </div>
             </div>
+
             <div id="filesLayout" style="width: 100%;"></div>
         </div>
 
@@ -365,19 +500,66 @@
 <div id="confirmModal" class="modal"><div class="modal-content"><h3>Are you sure? 🗑️</h3><p>This entry will be permanently deleted.</p><div class="alert-btns"><button class="alert-btn" style="background: #eee;" onclick="closeConfirm()">Cancel</button><button id="finalDeleteBtn" class="alert-btn" style="background: #ff4444; color: white;">Delete</button></div></div></div>
 <div id="editModal" class="modal"><div class="modal-content"><h3>Edit Entry ✏️</h3><input type="text" id="editTitle" class="auth-input"><textarea id="editText" rows="5" class="auth-input"></textarea><div style="display:flex; gap:10px; margin-bottom:10px;"><div style="flex:1; text-align:left;"><label style="font-size:12px; font-weight:bold; color:var(--dark-blue)">Date</label><input type="date" id="editDate" class="auth-input"></div><div style="flex:1; text-align:left;"><label style="font-size:12px; font-weight:bold; color:var(--dark-blue)">Time</label><input type="time" id="editTime" class="auth-input"></div></div><div id="currentEditGallery" class="edit-media-preview"></div><div class="file-upload-art" onclick="document.getElementById('editFile').click()"><span id="editFileLabel">Add Media ➕</span><input type="file" id="editFile" hidden onchange="handleNewEditFile()"></div><button id="updateBtn" class="auth-btn" onclick="updateNote()">Save Changes</button><button class="auth-btn" style="background:#eee; color:#333; margin-top:10px;" onclick="closeModal()">Cancel</button></div></div>
 <div id="alarmModal" class="modal"><div class="modal-content alarm-active" style="border: 4px solid var(--orange);"><h2 style="color: var(--orange);">⏰ Time's Up!</h2><h3 id="alarmNoteTitle">Note</h3><p id="alarmNoteContent" style="max-height: 150px; overflow-y: auto;"></p><button class="auth-btn" style="background: var(--orange);" onclick="stopAlarmUI(event)">Stop Alarm ✅</button></div></div>
-<div id="lightbox" onclick="this.style.display='none'"></div>
-
+<div id="lightbox">
+    <div id="lightbox-content"></div>
+</div>
 <script>
     const SB_URL = "https://ixzuotmqgdnlrkalwyyg.supabase.co", SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4enVvdG1xZ2RubHJrYWx3eXlnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1NDAwMTQsImV4cCI6MjA5MTExNjAxNH0.NrU4rKVfrHWB0x220iIGzr-aXGm_5EljV4CCoYFnojo";
     const _supabase = supabase.createClient(SB_URL, SB_KEY);
-    let currentView = 'active', rawData = [], currentUser = localStorage.getItem('mo_user'), isAlarmActive = false, editingId = null, currentAlarmingNoteId = null, tempEditMedia = [];
+   let currentView = 'active', rawData = [], currentUser = localStorage.getItem('mouser') || sessionStorage.getItem('mouser'), isAlarmActive = false, editingId = null, currentAlarmingNoteId = null, tempEditMedia = [];
     let azkarList = [], selectedZikrId = null, isAzkarFocusMode = false, currentAzkarCategory = null;
 
     // --- Auth ---
     function setMode(m) { document.getElementById('tab-login').classList.toggle('active', m==='login'); document.getElementById('tab-register').classList.toggle('active', m==='register'); window.authMode = m; }
-    async function handleAuth() { const u = document.getElementById('auth-user').value, p = document.getElementById('auth-pass').value; if(window.authMode === 'register') { await _supabase.from('journal_users').insert([{ username: u, password: p }]); location.reload(); } else { const { data } = await _supabase.from('journal_users').select('*').eq('username', u).eq('password', p).single(); if(data) { localStorage.setItem('mo_user', u); location.reload(); } } }
-    function logout() { localStorage.clear(); location.reload(); }
+  async function handleAuth() {
+    const u = document.getElementById('auth-user').value.trim();
+    const p = document.getElementById('auth-pass').value.trim();
 
+    if (!u || !p) { 
+        alert('ادخل اسم المستخدم وكلمة المرور'); 
+        return; 
+    }
+
+    if (window.authMode === 'register') {
+        const { error } = await _supabase
+            .from('journal_users')  // ← journal_users
+            .insert({ username: u, password: p });
+        
+        if (error) { 
+            alert('❌ خطأ في التسجيل: ' + error.message); 
+            return; 
+        }
+        localStorage.setItem('mouser', u);
+        sessionStorage.setItem('mouser', u);
+        location.reload();
+
+    } else {
+        const { data, error } = await _supabase
+            .from('journal_users')  // ← journal_users
+            .select('*')
+            .eq('username', u)
+            .single();
+
+        if (error || !data) {
+            alert('❌ اسم المستخدم غلط');
+            return;
+        }
+
+        if (data.password !== p) {
+            alert('❌ كلمة المرور غلط');
+            return;
+        }
+
+        localStorage.setItem('mouser', u);
+        sessionStorage.setItem('mouser', u);
+        location.reload();
+    }
+}
+   function logout() {
+    localStorage.removeItem('mouser');
+    sessionStorage.removeItem('mouser');
+    location.reload();
+}
     // --- Notes ---
     async function fetchNotes() {
         const { data } = await _supabase.from('notes').select('*').eq('owner_name', currentUser).eq('is_completed', currentView === 'history').order('created_at', {ascending: false});
@@ -539,7 +721,23 @@
         saveBtn.innerText = "Save Now ✨";
     }
 }
-    async function uploadFile(file) { if(!file) return null; const name = `${Date.now()}_${file.name}`; await _supabase.storage.from('media').upload(name, file); return _supabase.storage.from('media').getPublicUrl(name).data.publicUrl; }
+   async function uploadFile(file) {
+    if (!file) return null;
+
+    const MAX_SIZE = 50 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+        throw new Error(`الملف ${(file.size/1024/1024).toFixed(1)}MB - الحد الأقصى 50MB`);
+    }
+
+    const name = `notes/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+    const { data, error } = await _supabase.storage
+        .from('media')
+        .upload(name, file, { cacheControl: '3600', upsert: false });
+
+    if (error) throw error;
+
+    return _supabase.storage.from('media').getPublicUrl(name).data.publicUrl;
+}
     function setToday() { const n = new Date(); document.getElementById('noteDate').value = n.toISOString().split('T')[0]; document.getElementById('noteTime').value = n.toTimeString().slice(0,5); }
 
     // --- Azkar ---
@@ -774,66 +972,69 @@
 
     // --- Back Button Navigation ---
     let lastBackPress = 0;
-    function handleBack() {
-        // 1. Close Modals/Popups first
-        if (isAlarmActive) {
-            stopAlarmUI();
-            return;
-        }
-        if (document.getElementById('editModal').style.display === 'block') {
-            closeModal();
-            return;
-        }
-        if (document.getElementById('confirmModal').style.display === 'block') {
-            closeConfirm();
-            return;
-        }
-        if (document.getElementById('lightbox').style.display === 'flex') {
-            document.getElementById('lightbox').style.display = 'none';
-            return;
-        }
+   function handleBack() {
+    // 1. Close Modals/Popups first
+    if (isAlarmActive) {
+        stopAlarmUI();
+        return;
+    }
+    if (document.getElementById('editModal').style.display === 'block') {
+        closeModal();
+        return;
+    }
+    if (document.getElementById('confirmModal').style.display === 'block') {
+        closeConfirm();
+        return;
+    }
+    // ← التعديل: بدل 'flex' نتحقق إن مش none أو فاضي
+    const lb = document.getElementById('lightbox');
+    if (lb.style.display !== 'none' && lb.style.display !== '') {
+        lb.style.display = 'none';
+        lb.innerHTML = '';
+        return;
+    }
 
-        // 2. Azkar Section Navigation
-        if (currentView === 'azkar') {
-            if (isAzkarFocusMode) {
-                isAzkarFocusMode = false;
-                renderAzkar();
-            } else if (currentAzkarCategory) {
-                backToCategories();
-            } else {
-                changeView('active');
-            }
-            return; // Prevent falling through to exit logic
-        }
-
-        // 3. History View Navigation
-        if (currentView === 'history') {
-            changeView('active');
-            return;
-        }
-
-        // 4. Search active - Clear it
-        if (document.getElementById('fuzzySearch').value !== '') {
-            document.getElementById('fuzzySearch').value = '';
-            if (currentView === 'azkar') renderAzkar(); else renderStructure(rawData);
-            return;
-        }
-
-        // 5. Exit App with safety (Double tap logic)
-        const now = Date.now();
-        if (now - lastBackPress < 2000) {
-            if (typeof Android !== 'undefined' && Android.exitApp) {
-                Android.exitApp();
-            }
+    // 2. Azkar Section Navigation
+    if (currentView === 'azkar') {
+        if (isAzkarFocusMode) {
+            isAzkarFocusMode = false;
+            renderAzkar();
+        } else if (currentAzkarCategory) {
+            backToCategories();
         } else {
-            lastBackPress = now;
-            if (typeof Android !== 'undefined' && Android.showToast) {
-                Android.showToast("اضغط مرة أخرى للخروج");
-            } else {
-                console.log("Press back again to exit");
-            }
+            changeView('active');
+        }
+        return;
+    }
+
+    // 3. History View Navigation
+    if (currentView === 'history') {
+        changeView('active');
+        return;
+    }
+
+    // 4. Search active - Clear it
+    if (document.getElementById('fuzzySearch').value !== '') {
+        document.getElementById('fuzzySearch').value = '';
+        if (currentView === 'azkar') renderAzkar(); else renderStructure(rawData);
+        return;
+    }
+
+    // 5. Exit App with safety (Double tap logic)
+    const now = Date.now();
+    if (now - lastBackPress < 2000) {
+        if (typeof Android !== 'undefined' && Android.exitApp) {
+            Android.exitApp();
+        }
+    } else {
+        lastBackPress = now;
+        if (typeof Android !== 'undefined' && Android.showToast) {
+            Android.showToast("اضغط مرة أخرى للخروج");
+        } else {
+            console.log("Press back again to exit");
         }
     }
+}
 function changeView(v) {
     currentView = v;
     isAzkarFocusMode = false;
@@ -894,30 +1095,37 @@ function changeView(v) {
         const btn = document.getElementById(`stop-btn-${tid}`); if(btn) { btn.classList.add('stopped'); btn.innerHTML = '✅'; btn.style.display = 'flex'; }
     }
 
-    // --- UI Helpers ---
-    function zoom(u, t) { const lb = document.getElementById('lightbox'); lb.innerHTML = t==='v' ? `<video src="${u}" controls autoplay></video>` : `<img src="${u}">`; lb.style.display='flex'; }
+   
     function openEdit(id) { const n = rawData.find(x => x.id == id); if(!n) return; editingId = id; document.getElementById('editTitle').value = n.title; document.getElementById('editText').value = n.content; document.getElementById('editModal').style.display = 'block'; }
     function closeModal() { document.getElementById('editModal').style.display='none'; editingId = null; }
     function askDelete(id) { document.getElementById('confirmModal').style.display='block'; document.getElementById('finalDeleteBtn').onclick=()=> { _supabase.from('notes').delete().eq('id', id).then(()=>location.reload()); }; }
     function closeConfirm() { document.getElementById('confirmModal').style.display='none'; }
     async function markDone(id, btn) { if(btn) btn.disabled = true; await _supabase.from('notes').update({is_completed: true}).eq('id', id); fetchNotes(); }
 
-    // --- Init ---
-    if(currentUser) {
-        document.getElementById('auth-container').style.display = 'none';
-        document.getElementById('journal-app').style.display = 'flex';
-        const colors = ['#ff851b', '#2ecc71', '#3498db', '#9b59b6', '#f1c40f', '#e74c3c'];
-        let coloredName = ''; const firstName = currentUser.split(' ')[0];
-        for(let i=0; i < firstName.length; i++) coloredName += `<span class="${i===0?'animated-letter':''}" style="color:${colors[i%colors.length]}">${i===0?firstName[i].toUpperCase():firstName[i]}</span>`;
-        document.getElementById('user-avatar-text').innerHTML = coloredName;
-        fetchNotes();
-        setupSearch();
-    } else { setMode('login'); }
-    setInterval(updateAllCountdowns, 1000);
-    function setupSwipe(el, id) {
+   // --- Init ---
+if(currentUser) {
+    document.getElementById('auth-container').style.display = 'none';
+    document.getElementById('journal-app').style.display = 'flex';
+
+    // ← مسافة الأمان لشاشات الأندرويد
+    if (typeof Android !== 'undefined') {
+        document.body.classList.add('is-android');
+    }
+
+    const colors = ['#ff851b', '#2ecc71', '#3498db', '#9b59b6', '#f1c40f', '#e74c3c'];
+    let coloredName = ''; const firstName = currentUser.split(' ')[0];
+    for(let i=0; i < firstName.length; i++) coloredName += `<span class="${i===0?'animated-letter':''}" style="color:${colors[i%colors.length]}">${i===0?firstName[i].toUpperCase():firstName[i]}</span>`;
+    document.getElementById('user-avatar-text').innerHTML = coloredName;
+    fetchNotes();
+    setupSearch();
+} else { setMode('login'); }
+
+setInterval(updateAllCountdowns, 1000);
+
+function setupSwipe(el, id) {
     let startX = 0;
     let currentX = 0;
-    const threshold = -80; // المسافة اللي بعدها الزرار يثبت
+    const threshold = -80;
 
     el.addEventListener('touchstart', (e) => {
         startX = e.touches[0].clientX;
@@ -926,7 +1134,6 @@ function changeView(v) {
 
     el.addEventListener('touchmove', (e) => {
         currentX = e.touches[0].clientX - startX;
-        // نسمح بالسحب للشمال فقط وبحد أقصى معين
         if (currentX < 0 && currentX > -120) {
             el.style.transform = `translateX(${currentX}px)`;
         }
@@ -935,9 +1142,9 @@ function changeView(v) {
     el.addEventListener('touchend', () => {
         el.classList.remove('swiping');
         if (currentX < threshold) {
-            el.style.transform = `translateX(${threshold}px)`; // يثبت على زرار المسح
+            el.style.transform = `translateX(${threshold}px)`;
         } else {
-            el.style.transform = `translateX(0px)`; // يرجع مكانه
+            el.style.transform = `translateX(0px)`;
         }
         currentX = 0;
     });
@@ -1069,51 +1276,82 @@ async function updateNoteColor(id, color) {
     if(error) console.error("Color update failed");
 }
 // --- My Files Logic ---
-
 async function uploadGeneralFile() {
     const fileEl = document.getElementById('fileInputGeneral');
     const file = fileEl.files[0];
     if (!file) return;
 
+    const MAX_SIZE = 50 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+        alert(`❌ الملف كبير جداً!\nالحجم: ${(file.size/1024/1024).toFixed(1)} MB\nالحد الأقصى: 50 MB`);
+        fileEl.value = '';
+        return;
+    }
+
     const progress = document.getElementById('uploadProgress');
     const label = document.getElementById('fileInputLabel');
-
     progress.style.display = 'block';
-    label.innerText = "Processing...";
+    progress.innerText = '⏳ Uploading...';
+    label.innerText = 'Uploading...';
 
     try {
-        const fileName = `${Date.now()}_${file.name}`;
-        // 1. الرفع لـ Storage (تأكد أن عندك Bucket اسمه media)
-        const { data, error } = await _supabase.storage.from('media').upload(`files/${fileName}`, file);
-        if (error) throw error;
+        const cleanName = file.name.replace(/[^a-zA-Z0-9._\u0600-\u06FF-]/g, '_');
+        const fileName = `${Date.now()}_${cleanName}`;
 
-        const publicUrl = _supabase.storage.from('media').getPublicUrl(`files/${fileName}`).data.publicUrl;
+        const { error: storageError } = await _supabase.storage
+            .from('media')
+            .upload(`files/${fileName}`, file, {
+                cacheControl: '3600',
+                upsert: false
+            });
 
-        // 2. الحفظ في جدول my_files
-        await _supabase.from('my_files').insert([{
-            file_name: file.name,
-            file_url: publicUrl,
-            file_type: file.type,
-            file_size: file.size,
-            owner_name: currentUser
-        }]);
+        if (storageError) throw storageError;
 
-        label.innerText = "Upload Success! ✅";
-        setTimeout(() => label.innerText = "Upload Any File (PDF, Excel, Doc...) 📤", 2000);
-        fetchFiles();
+        const publicUrl = _supabase.storage
+            .from('media')
+            .getPublicUrl(`files/${fileName}`).data.publicUrl;
+
+        // ← نستخدم my_files مع أعمدته الأصلية
+        const { data: dbData, error: dbError } = await _supabase
+            .from('my_files')
+            .insert([{
+                file_name: file.name,
+                file_url: publicUrl,
+                file_type: file.type || 'application/octet-stream',
+                file_size: file.size,
+                owner_name: currentUser
+            }])
+            .select();
+
+        if (dbError) throw dbError;
+
+        progress.innerText = '✅ تم الرفع بنجاح!';
+        label.innerText = 'Upload Any File (PDF, Excel, Doc...) 📤';
+        fileEl.value = '';
+
+        setTimeout(() => {
+            progress.style.display = 'none';
+            fetchFiles();
+        }, 1500);
+
     } catch (err) {
-        alert("Upload failed: " + err.message);
-    } finally {
+        console.error(err);
         progress.style.display = 'none';
-        fileEl.value = ''; // تصفير المدخل
+        label.innerText = 'Upload Any File (PDF, Excel, Doc...) 📤';
+        fileEl.value = '';
+        alert('❌ Upload Failed:\n' + err.message);
     }
 }
 
 async function fetchFiles() {
-    const { data } = await _supabase.from('my_files')
+    // ← my_files مع أعمدته الأصلية
+    const { data, error } = await _supabase
+        .from('my_files')
         .select('*')
         .eq('owner_name', currentUser)
-        .order('created_at', {ascending: false});
+        .order('created_at', { ascending: false });
+
+    if (error) console.error('fetchFiles error:', error);
     renderFiles(data || []);
 }
 function renderFiles(files) {
@@ -1129,50 +1367,30 @@ function renderFiles(files) {
         card.style.backgroundColor = '#ffffff';
         card.style.border = '1px solid #eee';
 
-        // --- منطق التعرف على نوع الملف والبريفيو الشامل ---
         let previewHtml = '';
         const type = f.file_type.toLowerCase();
         const name = f.file_name.toLowerCase();
 
+        // 1. منطق البريفيو الشامل
         if (type.includes('image')) {
-            // صور: بريفيو حقيقي
             previewHtml = `<img src="${f.file_url}" style="width:100%; height:120px; object-fit:cover; border-radius:10px;">`;
         } else if (type.includes('pdf')) {
-            // PDF: أيقونة حمراء احترافية
             previewHtml = `<div style="height:120px; background:#fff1f0; color:#e74c3c; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
                 <span style="font-size:50px;">📕</span>
                 <span style="font-size:10px; font-weight:bold; margin-top:5px; color:#e74c3c;">PDF DOCUMENT</span>
             </div>`;
-        } else if (type.includes('sheet') || name.endsWith('.xls') || name.endsWith('.xlsx') || name.endsWith('.csv')) {
-            // Excel: أيقونة خضراء (شغل الصيدلية)
+        } else if (type.includes('sheet') || name.endsWith('.xls') || name.endsWith('.xlsx')) {
             previewHtml = `<div style="height:120px; background:#eafaf1; color:#27ae60; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
                 <span style="font-size:50px;">📊</span>
                 <span style="font-size:10px; font-weight:bold; margin-top:5px; color:#27ae60;">EXCEL SHEET</span>
             </div>`;
-        } else if (type.includes('word') || name.endsWith('.doc') || name.endsWith('.docx')) {
-            // Word: أيقونة زرقاء
-            previewHtml = `<div style="height:120px; background:#ebf5fb; color:#2980b9; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-                <span style="font-size:50px;">📝</span>
-                <span style="font-size:10px; font-weight:bold; margin-top:5px; color:#2980b9;">WORD DOC</span>
-            </div>`;
-        } else if (name.endsWith('.html') || name.endsWith('.css') || name.endsWith('.js') || name.endsWith('.json')) {
-            // ملفات البرمجة (Code)
+        } else if (name.endsWith('.html') || name.endsWith('.js') || name.endsWith('.css')) {
             previewHtml = `<div style="height:120px; background:#f4ecf7; color:#8e44ad; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
                 <span style="font-size:50px;">💻</span>
-                <span style="font-size:10px; font-weight:bold; margin-top:5px; color:#8e44ad;">SOURCE CODE</span>
-            </div>`;
-        } else if (type.includes('text') || name.endsWith('.txt')) {
-            // ملفات نصية بسيطة
-            previewHtml = `<div style="height:120px; background:#f8f9f9; color:#7f8c8d; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-                <span style="font-size:50px;">📄</span>
-                <span style="font-size:10px; font-weight:bold; margin-top:5px; color:#7f8c8d;">TEXT FILE</span>
+                <span style="font-size:10px; font-weight:bold; margin-top:5px; color:#8e44ad;">CODE FILE</span>
             </div>`;
         } else {
-            // أي نوع ملف آخر غير معروف
-            previewHtml = `<div style="height:120px; background:#fef9e7; color:#f1c40f; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-                <span style="font-size:50px;">📦</span>
-                <span style="font-size:10px; font-weight:bold; margin-top:5px; color:#f39c12;">OTHER FILE</span>
-            </div>`;
+            previewHtml = `<div style="height:120px; background:#f5f5f5; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:50px;">📄</div>`;
         }
 
         card.innerHTML = `
@@ -1189,37 +1407,136 @@ function renderFiles(files) {
             <p style="font-size:10px; color:#999; margin-bottom:15px;">Size: ${(f.file_size/1024).toFixed(1)} KB</p>
 
             <div style="margin-top:auto; display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-                <button class="auth-btn" style="padding:10px; font-size:12px; background:var(--dark-blue);" onclick="viewFile('${f.file_url}', '${f.file_type}')">View 👁️</button>
-                <a href="${f.file_url}" download="${f.file_name}" target="_blank" style="text-decoration:none;">
-                    <button class="auth-btn" style="padding:10px; font-size:12px; width:100%; background:var(--orange);">Get 📥</button>
-                </a>
+                <button class="auth-btn" style="padding:10px; font-size:12px; background:var(--dark-blue);"
+                        onclick="viewFile('${f.file_url}', '${f.file_type}')">View 👁️</button>
+
+                <button class="auth-btn" style="padding:10px; font-size:12px; width:100%; background:var(--orange);"
+                        onclick="handleDownload('${f.file_url}', '${f.file_name}')">Get 📥</button>
             </div>
         `;
         row.appendChild(card);
     });
     layout.appendChild(row);
 }
+// ── استبدل viewFile القديمة بالكامل ──
 function viewFile(url, type) {
+    const isAndroid = typeof Android !== 'undefined';
     const lb = document.getElementById('lightbox');
-    if (type.includes('image') || type.includes('video')) {
-        zoom(url, type.includes('video') ? 'v' : 'i');
+
+    // إعداد الـ lightbox
+    lb.style.cssText = 'display:block; position:fixed; top:0; left:0; width:100%; height:100%; z-index:9999999; background:#001f3f; margin:0; padding:0;';
+    lb.innerHTML = '';
+
+    const statusBar = isAndroid ? 28 : 0;
+    const headerH = 55 + statusBar;
+
+    // ── Header بـ absolute ──
+    const header = document.createElement('div');
+    header.style.cssText = `position:absolute; top:0; left:0; right:0; height:${headerH}px; padding-top:${statusBar}px; background:#001f3f; display:flex; align-items:center; justify-content:center; gap:10px; z-index:10; border-bottom:2px solid rgba(255,133,27,0.4); box-sizing:border-box;`;
+
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'auth-btn';
+    closeBtn.style.cssText = 'width:auto; padding:6px 18px; background:#555; font-size:13px;';
+    closeBtn.textContent = 'Close ❌';
+    closeBtn.onclick = () => { lb.style.display = 'none'; lb.innerHTML = ''; };
+
+    const extBtn = document.createElement('button');
+    extBtn.className = 'auth-btn';
+    extBtn.style.cssText = 'width:auto; padding:6px 18px; background:#ff851b; font-size:13px;';
+    extBtn.textContent = 'Open External ↗️';
+    extBtn.onclick = () => {
+        if (isAndroid) Android.openExternal(url);
+        else window.open(url, '_blank');
+    };
+
+    header.appendChild(closeBtn);
+    header.appendChild(extBtn);
+
+    // ── Content Area بـ absolute ──
+    const content = document.createElement('div');
+    content.style.cssText = `position:absolute; top:${headerH}px; left:0; right:0; bottom:0; overflow:hidden; background:#001f3f;`;
+
+    const ltype = type.toLowerCase();
+
+    if (ltype.includes('image')) {
+        content.style.cssText += 'display:flex; align-items:center; justify-content:center; background:#000;';
+        const img = document.createElement('img');
+        img.src = url;
+        img.style.cssText = 'max-width:100%; max-height:100%; object-fit:contain; display:block;';
+        content.appendChild(img);
+
+    } else if (ltype.includes('video')) {
+        content.style.background = '#000';
+        const vid = document.createElement('video');
+        vid.src = url;
+        vid.controls = true;
+        vid.autoplay = true;
+        vid.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%;';
+        content.appendChild(vid);
+
     } else {
-        // عرض الـ PDF والملفات الأخرى في iframe
-        lb.innerHTML = `<div style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center;">
-            <button class="auth-btn" style="width:auto; margin:10px;" onclick="document.getElementById('lightbox').style.display='none'">Close ❌</button>
-            <iframe src="${url}" style="width:95%; height:85%; border:none; background:white; border-radius:15px;"></iframe>
-        </div>`;
-        lb.style.display = 'flex';
+        // PDF / Excel / أي ملف
+        const encodedUrl = encodeURIComponent(url);
+        const finalUrl = isAndroid
+            ? `https://docs.google.com/gview?embedded=true&url=${encodedUrl}`
+            : url;
+
+        const loader = document.createElement('div');
+        loader.id = 'loading-text';
+        loader.style.cssText = 'position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:#ff851b; font-weight:bold; font-size:16px; z-index:5; text-align:center;';
+        loader.innerHTML = '⏳ Loading file...';
+
+        const iframe = document.createElement('iframe');
+        iframe.src = finalUrl;
+        iframe.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; border:none; z-index:2;';
+        iframe.onload = () => loader.style.display = 'none';
+        iframe.onerror = () => { loader.innerHTML = '❌ Failed to load'; };
+
+        content.appendChild(loader);
+        content.appendChild(iframe);
+    }
+
+    lb.appendChild(header);
+    lb.appendChild(content);
+}
+
+// ── zoom بتنادي viewFile ──
+function zoom(u, t) {
+    viewFile(u, t === 'v' ? 'video/mp4' : 'image/jpeg');
+}
+function closeViewer() {
+    const lb = document.getElementById('lightbox');
+    lb.style.display = 'none';
+    lb.innerHTML = '';
+}
+
+function openExt(url) {
+    if (typeof Android !== 'undefined') Android.openExternal(url);
+    else window.open(url, '_blank');
+}
+function handleDownload(url, name) {
+    if (typeof Android !== 'undefined') {
+        // للأندرويد: نستخدم واجهة النظام لفتح الرابط وبدء التحميل
+        Android.openExternal(url);
+    } else {
+        // للويب: ننشئ رابط وهمي لبدء التحميل في نفس الصفحة
+        const a = document.createElement('a');
+        a.href = url;
+        a.setAttribute('download', name);
+        a.target = '_self';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     }
 }
 // استبدل دالة deleteFile القديمة بهذي
 function deleteFile(id) {
-    // نستخدم الـ Art Modal الموحد اللي عملناه للأذكار
+    // الترتيب الصح: title, icon, placeholder, value, onConfirm
     openArtModal(
         "حذف الملف نهائياً؟",
         "🗑️",
         "",
-        "confirm_delete", // قيمة وهمية للتمييز
+        "", // الـ value خليه فاضي
         async () => {
             const { error } = await _supabase.from('my_files').delete().eq('id', id);
             if (!error) {
@@ -1229,10 +1546,25 @@ function deleteFile(id) {
         }
     );
 
-    // تعديل بسيط: نخفي الإدخال في حالة المسح
-    document.getElementById('artModalInput').style.display = 'none';
-    document.getElementById('artModalConfirm').style.background = '#e74c3c';
-    document.getElementById('artModalConfirm').innerText = 'تأكيد الحذف';
+    // إخفاء الحقل وتغيير اللون (تأكد إن الكود ده يتنفذ بعد فتح المودال)
+    setTimeout(() => {
+        document.getElementById('artModalInput').style.display = 'none';
+        const confirmBtn = document.getElementById('artModalConfirm');
+        confirmBtn.style.background = '#e74c3c';
+        confirmBtn.innerText = 'تأكيد الحذف';
+    }, 10);
+}
+function openTransfer() {
+    const transferUrl = "http://192.168.8.149:5000/";
+    
+    // في الأندرويد، الـ iframe غالباً مبيفتحش IP محلي بسبب الـ Security
+    // الحل الأضمن هو فتحه في المتصفح الخارجي
+    if (typeof Android !== 'undefined') {
+        Android.showToast("Opening Transfer Link...");
+        Android.openExternal(transferUrl);
+    } else {
+        window.open(transferUrl, '_blank');
+    }
 }
 </script>
 </body>
