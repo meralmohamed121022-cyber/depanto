@@ -2083,11 +2083,12 @@ let currentAudio          = null;
 let mushafSurahList       = [];
 let pendingHighlight      = null;
 let ayahPickerSelectedSurah = 1; 
+// استبدل المصفوفة دي في كودك يا Mo
 const SURAH_PAGES = [
     1, 2, 50, 77, 106, 128, 151, 177, 187, 208, 221, 235, 249, 255, 262, 267, 282, 293, 305, 312, 322, 332, 342, 350, 359, 367, 377, 385, 396, 404, 
     411, 415, 418, 428, 434, 440, 446, 453, 458, 467, 477, 483, 489, 496, 499, 502, 507, 511, 515, 518, 520, 523, 526, 528, 531, 534, 537, 542, 545, 549, 
     551, 553, 554, 556, 558, 560, 562, 564, 566, 568, 570, 572, 574, 575, 577, 578, 580, 582, 583, 585, 587, 589, 591, 593, 594, 595, 596, 597, 598, 599, 
-    600, 601, 601, 602, 602, 603, 603, 604, 604, 604, 605, 605, 605, 606, 606, 606, 607, 607, 607, 608, 608, 608, 609, 609
+    600, 601, 601, 602, 602, 603, 603, 604, 604, 604, 600, 601, 601, 602, 602, 603, 603, 604, 604, 604, 604, 604, 604, 604
 ];
 const JUZ_NAMES = [
     'الم','سيقول','تلك الرسل','لن تنالوا','والمحصنات',
@@ -2586,80 +2587,104 @@ function scrollAndHighlightAyah(surahNum, ayahNum) {
 // ✅ الانتقال من البحث مع تعليم
 // ============================================================
 function goToSearchResult(page, surahNum, ayahNum) {
-    if (!page) return; // تأمين ضد القيم الفاضية
+    if (!page) return; 
     
-    page = parseInt(page);
-    currentMushafPage = page; // تحديث الرقم العام
+    // ✅ تأمين رقم الصفحة: المصحف من 1 لـ 604 فقط
+    let p = parseInt(page);
+    if (p > 604) p = 604;
+    if (p < 1) p = 1;
     
+    currentMushafPage = p; 
+    
+    // إخفاء نتائج البحث (الصغيرة والعامة)
     const resultsDiv = document.getElementById('mushaf-search-results');
     if (resultsDiv) resultsDiv.style.display = 'none';
 
     mushafViewMode = 'text'; 
-    pendingHighlight = { surah: parseInt(surahNum), ayah: parseInt(ayahNum) };
+    
+    // تجهيز بيانات التظليل والسكرول
+    // لو مفيش رقم آية (زي الانتقال لسورة) بنخليها أول آية
+    pendingHighlight = { 
+        surah: parseInt(surahNum) || 0, 
+        ayah: parseInt(ayahNum) || 1 
+    };
 
-    // لو المصحف مقفول أصلاً نفتحه
+    // لو المصحف مقفول أصلاً نفتحه، لو مفتوح نعمل رندر فوراً
     if (!document.getElementById('mushaf-overlay')) {
         openMushaf(mushafMode || 'reading');
     } else {
-        renderMushaf(); // لو مفتوح نعمل رندر فوراً
+        renderMushaf();
     }
 }
-
 // ============================================================
 // ✅ نافذة الانتقال مع بحث موحد شامل
 // ============================================================
 async function showMushafNav() {
-    document.getElementById('mushaf-nav-panel')?.remove();
+    // حذف أي نسخة قديمة
+    const oldPanel = document.getElementById('mushaf-nav-panel');
+    if (oldPanel) oldPanel.remove();
+    
     await fetchSurahList();
 
     const panel = document.createElement('div');
     panel.id = 'mushaf-nav-panel';
     panel.style.cssText = `
-        position:fixed;bottom:0;left:0;right:0;z-index:10030;
-        background:white;border-radius:20px 20px 0 0;
-        box-shadow:0 -5px 30px rgba(0,0,0,0.3);
-        max-height:80vh;display:flex;flex-direction:column;
+        position:fixed; bottom:0; left:0; right:0; z-index:10030;
+        background:white; border-radius:25px 25px 0 0;
+        box-shadow:0 -10px 40px rgba(0,0,0,0.4);
+        max-height:85vh; display:flex; flex-direction:column;
+        animation: slideUp 0.3s ease-out;
     `;
 
+    // إضافة أنيميشن الطلوع
+    if (!document.getElementById('mushaf-nav-style')) {
+        const style = document.createElement('style');
+        style.id = 'mushaf-nav-style';
+        style.innerHTML = `@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }`;
+        document.head.appendChild(style);
+    }
+
     panel.innerHTML = `
-        <div style="padding:14px 20px;background:var(--dark-blue, #001f3f);
-            border-radius:20px 20px 0 0;flex-shrink:0;
-            display:flex;align-items:center;justify-content:space-between;">
-            <span style="color:var(--orange, #ff851b);font-weight:bold;font-size:16px;">🗂️ انتقال إلى</span>
+        <div style="padding:16px 20px; background:var(--dark-blue, #001f3f);
+            border-radius:25px 25px 0 0; flex-shrink:0;
+            display:flex; align-items:center; justify-content:space-between;">
+            <span style="color:var(--orange, #ff851b); font-weight:bold; font-size:18px; font-family:'Amiri Quran',serif;">🗂️ قائمة الانتقال السريع</span>
             <div onclick="document.getElementById('mushaf-nav-panel').remove()"
-                style="color:white;font-size:22px;cursor:pointer;">✕</div>
+                style="color:white; font-size:24px; cursor:pointer; width:35px; height:35px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.1); border-radius:50%;">✕</div>
         </div>
 
-        <div style="padding:10px 12px;flex-shrink:0;background:#f9f9f9;border-bottom:1px solid #eee;">
+        <div style="padding:12px; flex-shrink:0; background:#fdfcf0; border-bottom:1px solid #eee;">
             <input type="text" id="nav-unified-search"
                 placeholder="🔍 ابحث عن سورة، جزء، أو رقم صفحة..."
                 oninput="navUnifiedSearch(this.value)"
-                style="width:100%;padding:9px 14px;border-radius:12px;
-                border:2px solid var(--orange, #ff851b);font-size:14px;
-                direction:rtl;outline:none;box-sizing:border-box;
-                font-family:'Amiri Quran',serif;">
+                style="width:100%; padding:12px 16px; border-radius:15px;
+                border:2px solid var(--orange, #ff851b); font-size:15px;
+                direction:rtl; outline:none; box-sizing:border-box;
+                font-family:'Amiri Quran',serif; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
         </div>
 
-        <div id="nav-tabs-bar" style="display:flex;flex-shrink:0;border-bottom:2px solid #eee;">
+        <div id="nav-tabs-bar" style="display:flex; flex-shrink:0; background:#fdfcf0; padding:0 10px; border-bottom:1px solid #eee;">
             <button onclick="switchNavTab('surah')" id="nav-tab-surah"
-                style="flex:1;padding:12px;border:none;background:var(--orange, #ff851b);
-                color:white;font-weight:bold;font-size:13px;cursor:pointer;">📖 السور</button>
+                style="flex:1; padding:12px; border:none; background:var(--orange, #ff851b);
+                color:white; font-weight:bold; border-radius:10px 10px 0 0; margin:0 2px; font-size:14px; cursor:pointer;">📖 السور</button>
             <button onclick="switchNavTab('juz')" id="nav-tab-juz"
-                style="flex:1;padding:12px;border:none;background:#f5f5f5;
-                color:#333;font-weight:bold;font-size:13px;cursor:pointer;">📑 الأجزاء</button>
+                style="flex:1; padding:12px; border:none; background:#eee;
+                color:#555; font-weight:bold; border-radius:10px 10px 0 0; margin:0 2px; font-size:14px; cursor:pointer;">📑 الأجزاء</button>
             <button onclick="switchNavTab('ayah')" id="nav-tab-ayah"
-                style="flex:1;padding:12px;border:none;background:#f5f5f5;
-                color:#333;font-weight:bold;font-size:13px;cursor:pointer;">🔢 آية</button>
+                style="flex:1; padding:12px; border:none; background:#eee;
+                color:#555; font-weight:bold; border-radius:10px 10px 0 0; margin:0 2px; font-size:14px; cursor:pointer;">🔢 آية</button>
         </div>
 
-        <div id="nav-tab-content" style="flex:1;overflow-y:auto;padding:8px;">
+        <div id="nav-tab-content" style="flex:1; overflow-y:auto; padding:10px; background:white;">
             ${buildSurahListNav('')}
         </div>
     `;
 
     document.body.appendChild(panel);
+    
+    // التركيز على حقل البحث تلقائياً
+    setTimeout(() => document.getElementById('nav-unified-search')?.focus(), 350);
 }
-
 // ============================================================
 // ✅ البحث الموحد في الانتقال
 // ============================================================
@@ -3045,12 +3070,10 @@ async function mushafFuzzySearch(value) {
                 const aNum  = parseInt(m.numberInSurah);
                 const sName = m.surah.name;
                 
-                // ✅ الحل الجذري لمشكلة الـ NaN:
-                // لو الصفحة مش موجودة في نتيجة البحث، بنجيب أول صفحة في السورة من المصفوفة الثابتة
-                let pNum = parseInt(m.page);
-                if (isNaN(pNum)) {
-                    pNum = SURAH_PAGES[sNum - 1]; 
-                }
+                // ✅ التعديل هنا يا Mo:
+                // بنستخدم المصفوفة الثابتة SURAH_PAGES لضمان الوصول للصفحة الصح
+                // حتى لو الـ API رجع صفحة غلط أو ملمش صفحة خالص
+                let pNum = SURAH_PAGES[sNum - 1]; 
 
                 return `
                     <div onclick="document.getElementById('mushaf-search-results').style.display='none'; goToSearchResult(${pNum}, ${sNum}, ${aNum});"
