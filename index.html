@@ -300,16 +300,26 @@ body {
     border: none;
     display: block;
 }
-
-/* ✅ إخفاء شريط التنقل السفلي للمصحف على الموبايل */
+/* عدل الجزء ده في الـ CSS */
 @media (max-width: 768px) {
-    .mushaf-bottom-nav { display: none !important; }
-    /* إخفاء range slider على الشاشات الصغيرة جداً */
-    .mushaf-zoom-slider { display: none !important; }
-    /* تصغير أزرار toolbar */
-    .mushaf-toolbar-icon { width: 28px !important; height: 28px !important; font-size: 13px !important; }
-    /* تقليص label الشيخ */
-    #current-reciter-label { max-width: 55px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; vertical-align: middle; }
+    /* شيلنا display: none عشان يظهر في الموبايل */
+    .mushaf-zoom-slider { 
+        display: block !important; 
+        width: 80px !important; /* صغرنا العرض شوية عشان يناسب الموبايل */
+    }
+    
+    .mushaf-toolbar-icon { width: 28px !important; height: 28px !important; }
+}
+
+/* ستايل حاوية الزوم الجديدة */
+.zoom-container-mobile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 5px;
+    border-radius: 10px;
+    margin-right: 5px;
 }
 /* إضافة اختيارية: منع اختيار النص في كروت الأذكار أثناء السحب */
 .azkar-card {
@@ -2342,14 +2352,19 @@ async function openMushaf(mode) {
 // ✅ الـ Overlay الرئيسي
 // ============================================================
 function renderMushaf() {
-    // ✅ CSS مرة واحدة
+    // ✅ تحديث الـ CSS لمنع إخفاء الزوم في الموبايل وتنسيق مكانه الجديد
     if (!document.getElementById('mushaf-responsive-css')) {
         const s = document.createElement('style');
         s.id = 'mushaf-responsive-css';
         s.textContent = `
             @media (max-width: 768px) {
                 .mushaf-bottom-nav { display: none !important; }
-                .mushaf-zoom-slider { display: none !important; }
+                /* ✅ الشريط يظهر الآن في الموبايل */
+                .mushaf-zoom-slider { 
+                    display: block !important; 
+                    width: 70px !important; 
+                    margin: 0 !important;
+                }
             }
             .mushaf-toolbar-btn {
                 width:32px; height:32px; flex-shrink:0;
@@ -2358,6 +2373,18 @@ function renderMushaf() {
                 background:rgba(255,255,255,0.1); transition:background 0.2s;
             }
             .mushaf-toolbar-btn:active { background:rgba(255,255,255,0.3) !important; }
+            
+            /* حاوية الزوم تحت الأيقونات */
+            .mobile-zoom-container {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background: rgba(255, 255, 255, 0.1);
+                padding: 4px;
+                border-radius: 8px;
+                margin-top: 4px;
+                width: 100%;
+            }
         `;
         document.head.appendChild(s);
     }
@@ -2384,16 +2411,13 @@ function renderMushaf() {
     `;
 
     overlay.innerHTML = `
-
-        <!-- ✅ Toolbar العلوي -->
         <div style="flex-shrink:0;background:var(--dark-blue,#001f3f);
             padding:8px 10px;display:flex;align-items:center;gap:5px;
-            box-shadow:0 2px 10px rgba(0,0,0,0.3);">
+            box-shadow:0 2px 10px rgba(0,0,0,0.3); justify-content: space-between;">
 
             <div onclick="closeMushaf()" class="mushaf-toolbar-btn"
                 style="background:rgba(255,100,100,0.25);color:white;font-size:16px;">✕</div>
 
-            <!-- ✅ FIX 1: العنوان يعرض اسم السورة بعد التحميل -->
             <div style="flex:1;min-width:0;text-align:center;overflow:hidden;padding:0 2px;">
                 <div id="mushaf-surah-title"
                     style="color:var(--orange,#ff851b);font-weight:bold;
@@ -2408,32 +2432,32 @@ function renderMushaf() {
                 </div>
             </div>
 
-            <!-- أزرار الأدوات -->
-            <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
-                <input type="range" min="14" max="40" value="${mushafZoom}"
-                    oninput="changeMushafZoom(this.value)"
-                    class="mushaf-zoom-slider"
-                    style="width:55px;accent-color:var(--orange,#ff851b);">
-
-                <div onclick="toggleMushafViewMode()" class="mushaf-toolbar-btn">
-                    ${mushafViewMode === 'text' ? '🖼️' : '📝'}
+            <div style="display:flex; flex-direction:column; align-items:center; gap:2px; flex-shrink:0;">
+                
+                <div style="display:flex; align-items:center; gap:4px;">
+                    <div onclick="toggleMushafViewMode()" class="mushaf-toolbar-btn">
+                        ${mushafViewMode === 'text' ? '🖼️' : '📝'}
+                    </div>
+                    <div onclick="showMushafNav()" class="mushaf-toolbar-btn">🗂️</div>
+                    <div onclick="toggleTranslation()" class="mushaf-toolbar-btn"
+                        style="background:${mushafShowTranslation ? 'var(--orange,#ff851b)' : 'rgba(255,255,255,0.1)'};">
+                        🌍
+                    </div>
+                    <div onclick="togglePageBookmark()" id="bookmark-btn" class="mushaf-toolbar-btn"
+                        style="background:${isPageBookmarked ? 'var(--orange,#ff851b)' : 'rgba(255,255,255,0.1)'};">
+                        ${isPageBookmarked ? '🔖' : '🤍'}
+                    </div>
                 </div>
 
-                <div onclick="showMushafNav()" class="mushaf-toolbar-btn">🗂️</div>
-
-                <div onclick="toggleTranslation()" class="mushaf-toolbar-btn"
-                    style="background:${mushafShowTranslation ? 'var(--orange,#ff851b)' : 'rgba(255,255,255,0.1)'};">
-                    🌍
-                </div>
-
-                <div onclick="togglePageBookmark()" id="bookmark-btn" class="mushaf-toolbar-btn"
-                    style="background:${isPageBookmarked ? 'var(--orange,#ff851b)' : 'rgba(255,255,255,0.1)'};">
-                    ${isPageBookmarked ? '🔖' : '🤍'}
+                <div class="mobile-zoom-container">
+                    <input type="range" min="14" max="40" value="${mushafZoom}"
+                        oninput="changeMushafZoom(this.value)"
+                        class="mushaf-zoom-slider"
+                        style="accent-color:var(--orange,#ff851b); height: 18px;">
                 </div>
             </div>
         </div>
 
-        <!-- ✅ FIX 2: شريط البحث + الشيخ — ريسبونسيف بالكامل -->
         <div style="flex-shrink:0;background:#001f3f;padding:6px 10px;
             display:flex;gap:6px;align-items:center;min-width:0;">
 
@@ -2464,25 +2488,21 @@ function renderMushaf() {
             </div>
         </div>
 
-        <!-- نتائج البحث -->
         <div id="mushaf-search-results"
             style="display:none;flex-shrink:0;max-height:220px;overflow-y:auto;
             background:white;border-bottom:2px solid var(--orange,#ff851b);"></div>
 
-        <!-- محتوى الصفحة -->
         <div id="mushaf-page-content"
             style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
             padding:15px;direction:rtl;background:#fdfcf0;">
             <div style="text-align:center;padding-top:35%;font-size:35px;">⏳</div>
         </div>
 
-        <!-- ✅ FIX 3: Bottom Nav — السهم الأمامي على اليمين (ويب فقط) -->
         <div class="mushaf-bottom-nav"
             style="flex-shrink:0;background:var(--dark-blue,#001f3f);
             padding:10px 12px;display:flex;align-items:center;gap:8px;
             box-shadow:0 -2px 10px rgba(0,0,0,0.3);">
 
-            <!-- ✅ الصفحة السابقة (رقم أقل) على اليسار -->
             <button onclick="changeMushafPage(-1)" ${currentMushafPage <= 1 ? 'disabled' : ''}
                 style="flex:1;padding:11px;background:rgba(255,255,255,0.1);
                 border:2px solid var(--orange,#ff851b);border-radius:12px;
@@ -2496,7 +2516,6 @@ function renderMushaf() {
                 background:rgba(255,255,255,0.1);
                 color:white;font-size:16px;font-weight:bold;outline:none;">
 
-            <!-- ✅ الصفحة التالية (رقم أكبر) على اليمين -->
             <button onclick="changeMushafPage(1)" ${currentMushafPage >= 604 ? 'disabled' : ''}
                 style="flex:1;padding:11px;border:none;border-radius:12px;
                 color:white;font-size:20px;cursor:pointer;
@@ -2516,7 +2535,7 @@ function renderMushaf() {
     localStorage.setItem(`mushaf_last_page_${mushafMode}`, currentMushafPage);
     loadPageText(currentMushafPage);
 
-    // ✅ Touch Swipe
+    // Touch Swipe Logic
     setTimeout(() => {
         const pc = document.getElementById('mushaf-page-content');
         if (!pc) return;
