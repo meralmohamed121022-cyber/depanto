@@ -66,10 +66,41 @@ body {
         @keyframes dropBounce { 0% { transform: translateY(-60px); opacity: 0; } 30% { transform: translateY(0); opacity: 1; } 50% { transform: translateY(-25px); } 70% { transform: translateY(0); } 85% { transform: translateY(-10px); } 100% { transform: translateY(0); } }
 
         .search-box { width: 90%; max-width: 600px; padding: 12px 20px; border-radius: 50px; border: 2px solid var(--orange); background: var(--glass); color: white; margin: 15px 0; outline: none; }
-        .nav-tabs { margin-bottom: 20px; display: flex; gap: 10px; overflow-x: auto; padding: 5px; width: 95%; justify-content: center; }
-        .tab-btn { background: transparent; border: 2px solid var(--orange); color: white; padding: 8px 20px; border-radius: 50px; cursor: pointer; font-size: 13px; white-space: nowrap; flex-shrink: 0; }
-        .tab-btn.active { background: var(--orange); box-shadow: 0 0 10px var(--orange); }
+       .nav-tabs {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 5px 8px;
+    width: 100%;
+    justify-content: flex-start; /* ✅ بدل center */
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* إخفاء scrollbar في Firefox */
+}
 
+.nav-tabs::-webkit-scrollbar {
+    display: none; /* إخفاء scrollbar في Chrome/Safari */
+}
+
+.tab-btn {
+    background: transparent;
+    border: 2px solid var(--orange);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 13px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    scroll-snap-align: start; /* ✅ عشان كل تاب يظهر كامل */
+}
+
+.tab-btn.active {
+    background: var(--orange);
+    box-shadow: 0 0 10px var(--orange);
+}
         /* Notes Section */
         #notes-section { width: 100%; display: flex; flex-direction: column; align-items: center; }
         .glass-input { background: var(--white); padding: 20px; border-radius: 20px; width: 90%; max-width: 600px; box-shadow: 10px 10px 0px var(--orange); border: 3px solid var(--book-spine); color: #333; margin-bottom: 30px; }
@@ -270,11 +301,15 @@ body {
     display: block;
 }
 
+/* ✅ إخفاء شريط التنقل السفلي للمصحف على الموبايل */
 @media (max-width: 768px) {
-    #lightbox img, #lightbox video {
-        max-width: 100%;
-        max-height: 100%;
-    }
+    .mushaf-bottom-nav { display: none !important; }
+    /* إخفاء range slider على الشاشات الصغيرة جداً */
+    .mushaf-zoom-slider { display: none !important; }
+    /* تصغير أزرار toolbar */
+    .mushaf-toolbar-icon { width: 28px !important; height: 28px !important; font-size: 13px !important; }
+    /* تقليص label الشيخ */
+    #current-reciter-label { max-width: 55px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; vertical-align: middle; }
 }
 /* إضافة اختيارية: منع اختيار النص في كروت الأذكار أثناء السحب */
 .azkar-card {
@@ -584,6 +619,22 @@ body.is-android #fingerprint-container {
     width: 60px;
     height: 60px;
     fill: white;
+}
+/* إضافة في الـ CSS */
+@media screen {
+    .nav-tabs.app-hidden {
+        display: none !important;
+    }
+}
+/* إخفاء اسم المصحف الثابت في الموبايل */
+#mushaf-title-label {
+    display: none; /* أو حذفه من الـ HTML */
+}
+
+#mushaf-page-meta {
+    flex: 1;
+    overflow: hidden;
+    padding: 4px 8px;
 }
     </style>
 </head>
@@ -1470,43 +1521,99 @@ function changeView(v) {
     isAzkarFocusMode = false;
     document.getElementById('fuzzySearch').value = '';
 
-    // ✅ ضبط حالة الأزرار
-    document.getElementById('tabActive').classList.toggle('active', v === 'active');
-    document.getElementById('tabHistory').classList.toggle('active', v === 'history');
-    document.getElementById('tabAzkar').classList.toggle('active', v === 'azkar');
-    document.getElementById('tabMushaf').classList.toggle('active', v === 'mushaf'); // ✅
-    document.getElementById('tabFiles').classList.toggle('active', v === 'files');
+    // 1. تحديث شكل الأزرار فوراً (UI Sync)
+    const tabs = {
+        'active': 'tabActive',
+        'history': 'tabHistory',
+        'azkar': 'tabAzkar',
+        'mushaf': 'tabMushaf',
+        'files': 'tabFiles'
+    };
+    
+    Object.keys(tabs).forEach(key => {
+        const btn = document.getElementById(tabs[key]);
+        if (btn) btn.classList.toggle('active', v === key);
+    });
 
-    // ✅ إظهار وإخفاء الأقسام
-    document.getElementById('notes-section').style.display  = (v === 'active' || v === 'history') ? 'flex' : 'none';
-    document.getElementById('azkar-section').style.display  = v === 'azkar'  ? 'flex' : 'none';
-    document.getElementById('mushaf-section').style.display = v === 'mushaf' ? 'flex' : 'none'; // ✅
-    document.getElementById('files-section').style.display  = v === 'files'  ? 'flex' : 'none';
+    // 2. إخفاء كل الأقسام فوراً لتفريغ الذاكرة المرئية
+    const sections = ['notes-section', 'azkar-section', 'mushaf-section', 'files-section'];
+    sections.forEach(s => {
+        const el = document.getElementById(s);
+        if (el) el.style.display = 'none';
+    });
 
-    // ✅ إخفاء السيرش والبصمة
+    // إخفاء السيرش والبصمة
     document.getElementById('fuzzySearch').style.display =
         (v === 'azkar' || v === 'files' || v === 'mushaf') ? 'none' : 'block';
     document.getElementById('fingerprint-container').style.display = 'none';
 
-    // ✅ تحميل البيانات
-    if (v === 'files') {
-        fetchFiles();
+    // 3. تحميل البيانات بشكل "كسول" (Lazy Load)
+    // بنستخدم setTimeout 0 عشان ندي فرصة للمتصفح يخلص الـ Rendering بتاع الخطوات اللي فوق
+    setTimeout(() => {
+        // إظهار القسم المطلوب فقط
+        const targetId = v === 'active' || v === 'history' ? 'notes-section' : v + '-section';
+        const targetEl = document.getElementById(targetId);
+        if (targetEl) targetEl.style.display = 'flex';
 
-    } else if (v === 'azkar') {
-        if (!currentAzkarCategory) {
-            document.getElementById('category-selector').style.display = 'grid';
-            document.getElementById('azkar-list-view').style.display = 'none';
+        if (v === 'files') {
+            fetchFiles();
+        } else if (v === 'azkar') {
+            if (!currentAzkarCategory) {
+                document.getElementById('category-selector').style.display = 'grid';
+                document.getElementById('azkar-list-view').style.display = 'none';
+            } else {
+                fetchAzkar();
+            }
+        } else if (v === 'mushaf') {
+            renderMushafSelector();
         } else {
-            fetchAzkar();
+            fetchNotes();
         }
+    }, 10); // تأخير بسيط جداً يحل أزمة الـ Lag
+}
 
-    } else if (v === 'mushaf') { // ✅
-        renderMushafSelector();
-
-    } else {
-        fetchNotes();
+// ✅ إخفاء nav-tabs في التطبيق + swipe (تعديل بسيط لضمان الاستقرار)
+function initNavBehavior() {
+    const isApp = typeof Android !== 'undefined';
+    const navTabs = document.querySelector('.nav-tabs');
+    
+    if (navTabs) {
+        if (isApp) {
+            navTabs.style.display = 'none';
+            // إضافة كلاس لتمييز حالة التطبيق في الـ CSS لو احتجت
+            document.body.classList.add('is-app-mode');
+        } else {
+            navTabs.style.display = 'flex';
+        }
     }
 }
+
+// ✅ Swipe للتنقل بين الـ views
+(function setupSwipeNav() {
+    const views = ['active', 'history', 'azkar', 'mushaf', 'files'];
+    let touchStartX = 0, touchStartY = 0;
+
+    const container = document.getElementById('main-view-container');
+    if (!container) return;
+
+    container.addEventListener('touchstart', e => {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    container.addEventListener('touchend', e => {
+        if (typeof Android === 'undefined') return; // فقط في التطبيق
+        
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        const dy = Math.abs(e.changedTouches[0].clientY - touchStartY);
+        
+        if (Math.abs(dx) < 60 || dy > 50) return; // swipe صغير أو عمودي → تجاهل
+        
+        const idx = views.indexOf(currentView);
+        if (dx < 0 && idx < views.length - 1) changeView(views[idx + 1]); // يسار
+        if (dx > 0 && idx > 0) changeView(views[idx - 1]); // يمين
+    }, { passive: true });
+})();
     // --- Alarms ---
     function updateAllCountdowns() {
         if(editingId || currentView === 'azkar') return;
@@ -2083,6 +2190,7 @@ let currentAudio          = null;
 let mushafSurahList       = [];
 let pendingHighlight      = null;
 let ayahPickerSelectedSurah = 1; 
+
 // استبدل المصفوفة دي في كودك يا Mo
 const SURAH_PAGES = [
     1, 2, 50, 77, 106, 128, 151, 177, 187, 208, 221, 235, 249, 255, 262, 267, 282, 293, 305, 312, 322, 332, 342, 350, 359, 367, 377, 385, 396, 404, 
@@ -2133,27 +2241,47 @@ function getJuzFromPage(page) {
 // ============================================================
 function initGlobalMushafNav() {
     if (document.getElementById('global-mushaf-nav')) return;
+
     const btn = document.createElement('div');
     btn.id = 'global-mushaf-nav';
-    btn.innerHTML = '🗂️ مصحف القراءة';
+    btn.innerHTML = '📖';
     btn.style.cssText = `
-        position:fixed; bottom:20px; left:20px; z-index:9000;
-        background:var(--dark-blue, #001f3f); color:var(--orange, #ff851b);
-        padding:12px 18px; border-radius:30px; cursor:pointer; font-weight:bold;
-        box-shadow:0 4px 15px rgba(0,0,0,0.3); display:flex; align-items:center;
-        gap:8px; font-family:'Amiri Quran', serif; border:2px solid var(--orange, #ff851b);
-        transition: transform 0.2s;
+        position:fixed;
+        bottom:20px;
+        left:20px;
+        z-index:500;
+        background:rgba(0, 31, 63, 0.18);
+        color:var(--orange, #ff851b);
+        width:46px; height:46px;
+        border-radius:50%;
+        cursor:pointer;
+        display:flex; align-items:center; justify-content:center;
+        font-size:22px;
+        border:1.5px solid rgba(255,133,27,0.35);
+        backdrop-filter:blur(4px);
+        -webkit-backdrop-filter:blur(4px);
+        box-shadow:0 2px 10px rgba(0,0,0,0.12);
+        transition:transform 0.2s, background 0.2s;
+        -webkit-tap-highlight-color:transparent;
     `;
+
+    btn.onmouseenter = () => btn.style.background = 'rgba(0,31,63,0.35)';
+    btn.onmouseleave = () => btn.style.background = 'rgba(0,31,63,0.18)';
+    btn.ontouchstart  = () => btn.style.transform  = 'scale(0.88)';
+    btn.ontouchend    = () => btn.style.transform  = 'scale(1)';
+
     btn.onclick = () => {
-        if (!document.getElementById('mushaf-overlay')) {
-            mushafMode = 'reading';
-        }
+        if (!document.getElementById('mushaf-overlay')) mushafMode = 'reading';
         showMushafNav();
     };
-    document.body.appendChild(btn);
-}
-setTimeout(initGlobalMushafNav, 500);
 
+    // ✅ يظهر جوا #journal-app مش على document.body
+    const app = document.getElementById('journal-app');
+    if (app) app.appendChild(btn);
+    else document.body.appendChild(btn);
+}
+
+setTimeout(initGlobalMushafNav, 500);
 // ============================================================
 // ✅ جلب السور
 // ============================================================
@@ -2214,13 +2342,31 @@ async function openMushaf(mode) {
 // ✅ الـ Overlay الرئيسي
 // ============================================================
 function renderMushaf() {
-    // 1. التأكد أن الصفحة رقم صحيح (Security Check)
+    // ✅ CSS مرة واحدة
+    if (!document.getElementById('mushaf-responsive-css')) {
+        const s = document.createElement('style');
+        s.id = 'mushaf-responsive-css';
+        s.textContent = `
+            @media (max-width: 768px) {
+                .mushaf-bottom-nav { display: none !important; }
+                .mushaf-zoom-slider { display: none !important; }
+            }
+            .mushaf-toolbar-btn {
+                width:32px; height:32px; flex-shrink:0;
+                border-radius:50%; display:flex; align-items:center;
+                justify-content:center; cursor:pointer; font-size:15px;
+                background:rgba(255,255,255,0.1); transition:background 0.2s;
+            }
+            .mushaf-toolbar-btn:active { background:rgba(255,255,255,0.3) !important; }
+        `;
+        document.head.appendChild(s);
+    }
+
     currentMushafPage = parseInt(currentMushafPage);
     if (isNaN(currentMushafPage) || currentMushafPage < 1) {
         currentMushafPage = parseInt(localStorage.getItem(`mushaf_last_page_${mushafMode}`)) || 1;
     }
 
-    // حذف الأوفرلاي القديم لمنع التكرار
     document.getElementById('mushaf-overlay')?.remove();
     stopAudio();
 
@@ -2238,98 +2384,129 @@ function renderMushaf() {
     `;
 
     overlay.innerHTML = `
-        <div style="flex-shrink:0; background:var(--dark-blue, #001f3f); padding:10px 12px;
-            display:flex; align-items:center; justify-content:space-between;
-            box-shadow:0 2px 10px rgba(0,0,0,0.3); gap:6px;">
 
-            <div onclick="closeMushaf()" style="width:34px;height:34px;flex-shrink:0;
-                background:rgba(255,255,255,0.1);border-radius:50%;display:flex;
-                align-items:center;justify-content:center;cursor:pointer;color:white;font-size:18px;">✕</div>
-            
-            <div style="text-align:center;flex:1;min-width:0;">
-                <div style="color:var(--orange, #ff851b);font-weight:bold;font-size:13px;">
-                    ${mushafMode==='tahajjud'?'🌙 مصحف التهجد':'📖 مصحف القراءة'}
-                </div>
-                <div id="mushaf-page-meta" style="color:white;font-size:11px;opacity:0.8;
+        <!-- ✅ Toolbar العلوي -->
+        <div style="flex-shrink:0;background:var(--dark-blue,#001f3f);
+            padding:8px 10px;display:flex;align-items:center;gap:5px;
+            box-shadow:0 2px 10px rgba(0,0,0,0.3);">
+
+            <div onclick="closeMushaf()" class="mushaf-toolbar-btn"
+                style="background:rgba(255,100,100,0.25);color:white;font-size:16px;">✕</div>
+
+            <!-- ✅ FIX 1: العنوان يعرض اسم السورة بعد التحميل -->
+            <div style="flex:1;min-width:0;text-align:center;overflow:hidden;padding:0 2px;">
+                <div id="mushaf-surah-title"
+                    style="color:var(--orange,#ff851b);font-weight:bold;
+                    font-size:clamp(10px,3vw,13px);
                     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-                    صفحة ${currentMushafPage}/604 • الجزء ${getJuzFromPage(currentMushafPage)}
+                    ${mushafMode === 'tahajjud' ? '🌙' : '📖'} جاري التحميل...
+                </div>
+                <div id="mushaf-page-meta"
+                    style="color:white;font-size:clamp(9px,2.5vw,11px);
+                    opacity:0.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                    ص ${currentMushafPage}/604 • ج ${getJuzFromPage(currentMushafPage)}
                 </div>
             </div>
 
-            <div style="display:flex; align-items:center; gap:6px;">
-                <input type="range" min="14" max="40" value="${mushafZoom}" 
-                    oninput="changeMushafZoom(this.value)" 
-                    style="width:60px; accent-color:var(--orange, #ff851b);">
-                
-                <div onclick="toggleMushafViewMode()" style="width:34px;height:34px;flex-shrink:0;
-                    background:rgba(255,255,255,0.1); border-radius:50%;display:flex;
-                    align-items:center;justify-content:center;cursor:pointer;font-size:16px;">
+            <!-- أزرار الأدوات -->
+            <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
+                <input type="range" min="14" max="40" value="${mushafZoom}"
+                    oninput="changeMushafZoom(this.value)"
+                    class="mushaf-zoom-slider"
+                    style="width:55px;accent-color:var(--orange,#ff851b);">
+
+                <div onclick="toggleMushafViewMode()" class="mushaf-toolbar-btn">
                     ${mushafViewMode === 'text' ? '🖼️' : '📝'}
                 </div>
 
-                <div onclick="showMushafNav()" style="width:34px;height:34px;flex-shrink:0;
-                    background:rgba(255,255,255,0.1);border-radius:50%;display:flex;
-                    align-items:center;justify-content:center;cursor:pointer;font-size:16px;">🗂️</div>
+                <div onclick="showMushafNav()" class="mushaf-toolbar-btn">🗂️</div>
 
-                <div onclick="toggleTranslation()" style="width:34px;height:34px;flex-shrink:0;
-                    background:${mushafShowTranslation?'var(--orange, #ff851b)':'rgba(255,255,255,0.1)'};
-                    border-radius:50%;display:flex;align-items:center;
-                    justify-content:center;cursor:pointer;font-size:16px;">🌍</div>
+                <div onclick="toggleTranslation()" class="mushaf-toolbar-btn"
+                    style="background:${mushafShowTranslation ? 'var(--orange,#ff851b)' : 'rgba(255,255,255,0.1)'};">
+                    🌍
+                </div>
 
-                <div onclick="togglePageBookmark()" id="bookmark-btn" style="width:34px;height:34px;flex-shrink:0;
-                    background:${isPageBookmarked?'var(--orange, #ff851b)':'rgba(255,255,255,0.1)'};
-                    border-radius:50%;display:flex;align-items:center;
-                    justify-content:center;cursor:pointer;font-size:16px;">
-                    ${isPageBookmarked?'🔖':'🤍'}
+                <div onclick="togglePageBookmark()" id="bookmark-btn" class="mushaf-toolbar-btn"
+                    style="background:${isPageBookmarked ? 'var(--orange,#ff851b)' : 'rgba(255,255,255,0.1)'};">
+                    ${isPageBookmarked ? '🔖' : '🤍'}
                 </div>
             </div>
         </div>
 
-        <div style="flex-shrink:0;background:#001f3f;padding:8px 12px; display:flex;gap:8px;align-items:center;">
-            <input id="mushaf-search-input" type="text" placeholder="🔍 بحث في القرآن..." 
-                oninput="mushafFuzzySearch(this.value)" 
-                style="flex:1;padding:8px 12px;border-radius:20px;
-                border:1px solid var(--orange, #ff851b);background:rgba(255,255,255,0.1);
-                color:white;font-size:13px;direction:rtl;outline:none;
+        <!-- ✅ FIX 2: شريط البحث + الشيخ — ريسبونسيف بالكامل -->
+        <div style="flex-shrink:0;background:#001f3f;padding:6px 10px;
+            display:flex;gap:6px;align-items:center;min-width:0;">
+
+            <input id="mushaf-search-input" type="text" placeholder="🔍 بحث..."
+                oninput="mushafFuzzySearch(this.value)"
+                style="flex:1;min-width:0;width:0;
+                padding:7px 10px;border-radius:20px;
+                border:1px solid var(--orange,#ff851b);
+                background:rgba(255,255,255,0.1);
+                color:white;font-size:clamp(11px,3vw,13px);
+                direction:rtl;outline:none;
                 font-family:'Amiri Quran',serif;">
-            <div onclick="showReciterPicker()" style="padding:6px 10px;border-radius:8px;
-                border:1px solid var(--orange, #ff851b);background:#002d5a;color:white;
-                font-size:11px;cursor:pointer;flex-shrink:0;white-space:nowrap;
-                display:flex;align-items:center;gap:4px;">
-                🎙️ <span id="current-reciter-label">${RECITERS[currentReciter]?.replace('🎙️ ','') || 'القارئ'}</span>
+
+            <div onclick="showReciterPicker()"
+                style="flex-shrink:0;width:clamp(44px,22vw,90px);
+                padding:6px 6px;border-radius:8px;
+                border:1px solid var(--orange,#ff851b);
+                background:#002d5a;color:white;
+                font-size:11px;cursor:pointer;
+                display:flex;align-items:center;gap:2px;
+                overflow:hidden;box-sizing:border-box;">
+                <span style="flex-shrink:0;">🎙️</span>
+                <span id="current-reciter-label"
+                    style="overflow:hidden;text-overflow:ellipsis;
+                    white-space:nowrap;min-width:0;flex:1;">
+                    ${RECITERS[currentReciter]?.replace('🎙️ ', '') || 'القارئ'}
+                </span>
             </div>
         </div>
 
-        <div id="mushaf-search-results" style="display:none;flex-shrink:0;
-            max-height:220px;overflow-y:auto;background:white;
-            border-bottom:2px solid var(--orange, #ff851b);"></div>
+        <!-- نتائج البحث -->
+        <div id="mushaf-search-results"
+            style="display:none;flex-shrink:0;max-height:220px;overflow-y:auto;
+            background:white;border-bottom:2px solid var(--orange,#ff851b);"></div>
 
-        <div id="mushaf-page-content" style="flex:1;overflow-y:auto;
-            -webkit-overflow-scrolling:touch;padding:15px;direction:rtl;background:#fdfcf0;">
+        <!-- محتوى الصفحة -->
+        <div id="mushaf-page-content"
+            style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+            padding:15px;direction:rtl;background:#fdfcf0;">
             <div style="text-align:center;padding-top:35%;font-size:35px;">⏳</div>
         </div>
 
-        <div style="flex-shrink:0;background:var(--dark-blue, #001f3f);padding:10px 12px;
-            display:flex;align-items:center;gap:8px;box-shadow:0 -2px 10px rgba(0,0,0,0.3);">
-            <button onclick="changeMushafPage(1)" ${currentMushafPage>=604?'disabled':''}
-                style="flex:1;padding:11px;border:none;border-radius:12px;color:white;
-                font-size:20px;cursor:pointer;
-                background:${currentMushafPage>=604?'rgba(255,255,255,0.15)':'var(--orange, #ff851b)'};
-                opacity:${currentMushafPage>=604?'0.4':'1'};">›</button>
-            
+        <!-- ✅ FIX 3: Bottom Nav — السهم الأمامي على اليمين (ويب فقط) -->
+        <div class="mushaf-bottom-nav"
+            style="flex-shrink:0;background:var(--dark-blue,#001f3f);
+            padding:10px 12px;display:flex;align-items:center;gap:8px;
+            box-shadow:0 -2px 10px rgba(0,0,0,0.3);">
+
+            <!-- ✅ الصفحة السابقة (رقم أقل) على اليسار -->
+            <button onclick="changeMushafPage(-1)" ${currentMushafPage <= 1 ? 'disabled' : ''}
+                style="flex:1;padding:11px;background:rgba(255,255,255,0.1);
+                border:2px solid var(--orange,#ff851b);border-radius:12px;
+                color:white;font-size:20px;cursor:pointer;
+                opacity:${currentMushafPage <= 1 ? '0.4' : '1'};">‹</button>
+
             <input type="number" min="1" max="604" value="${currentMushafPage}"
                 onchange="jumpMushafPage(this.value)"
                 style="width:70px;text-align:center;padding:9px;border-radius:10px;
-                border:2px solid var(--orange, #ff851b);background:rgba(255,255,255,0.1);
+                border:2px solid var(--orange,#ff851b);
+                background:rgba(255,255,255,0.1);
                 color:white;font-size:16px;font-weight:bold;outline:none;">
 
-            <button onclick="changeMushafPage(-1)" ${currentMushafPage<=1?'disabled':''}
-                style="flex:1;padding:11px;background:rgba(255,255,255,0.1);
-                border:2px solid var(--orange, #ff851b);border-radius:12px;color:white;
-                font-size:20px;cursor:pointer;opacity:${currentMushafPage<=1?'0.4':'1'};">‹</button>
-            
-            <button onclick="showBookmarks()" style="width:44px;height:44px;flex-shrink:0;
-                background:rgba(255,255,255,0.1);border:2px solid var(--orange, #ff851b);
+            <!-- ✅ الصفحة التالية (رقم أكبر) على اليمين -->
+            <button onclick="changeMushafPage(1)" ${currentMushafPage >= 604 ? 'disabled' : ''}
+                style="flex:1;padding:11px;border:none;border-radius:12px;
+                color:white;font-size:20px;cursor:pointer;
+                background:${currentMushafPage >= 604 ? 'rgba(255,255,255,0.15)' : 'var(--orange,#ff851b)'};
+                opacity:${currentMushafPage >= 604 ? '0.4' : '1'};">›</button>
+
+            <button onclick="showBookmarks()"
+                style="width:44px;height:44px;flex-shrink:0;
+                background:rgba(255,255,255,0.1);
+                border:2px solid var(--orange,#ff851b);
                 border-radius:50%;font-size:18px;cursor:pointer;
                 display:flex;align-items:center;justify-content:center;">📚</button>
         </div>
@@ -2338,6 +2515,25 @@ function renderMushaf() {
     document.body.appendChild(overlay);
     localStorage.setItem(`mushaf_last_page_${mushafMode}`, currentMushafPage);
     loadPageText(currentMushafPage);
+
+    // ✅ Touch Swipe
+    setTimeout(() => {
+        const pc = document.getElementById('mushaf-page-content');
+        if (!pc) return;
+        let sx = 0, sy = 0;
+        pc.addEventListener('touchstart', e => {
+            sx = e.touches[0].clientX;
+            sy = e.touches[0].clientY;
+        }, { passive: true });
+        pc.addEventListener('touchend', e => {
+            const dx = e.changedTouches[0].clientX - sx;
+            const dy = Math.abs(e.changedTouches[0].clientY - sy);
+            if (Math.abs(dx) > 55 && dy < 80) {
+                if (dx < 0) changeMushafPage(1);
+                else changeMushafPage(-1);
+            }
+        }, { passive: true });
+    }, 200);
 }
 // ============================================================
 // ✅ دوال الزوم وتغيير العرض
@@ -2358,23 +2554,21 @@ function toggleMushafViewMode() {
 // ✅ تحديث معلومات الهيدر
 // ============================================================
 function updatePageMeta(ayahs) {
+    // ✅ FIX 1: تحديث اسم السورة في العنوان
+    const titleEl = document.getElementById('mushaf-surah-title');
+    if (titleEl && ayahs?.length) {
+        const surahsOnPage = [...new Set(ayahs.map(a => a.surah.name))];
+        const icon = (typeof mushafMode !== 'undefined' && mushafMode === 'tahajjud') ? '🌙' : '📖';
+        titleEl.textContent = surahsOnPage.length === 1
+            ? `${icon} ${surahsOnPage[0]}`
+            : `${icon} ${surahsOnPage[0]} • ${surahsOnPage[1] || ''}`;
+    }
+
+    // ... باقي الكود القديم للـ mushaf-page-meta يفضل زي ما هو
     const meta = document.getElementById('mushaf-page-meta');
     if (!meta || !ayahs?.length) return;
-    const surahsOnPage = [...new Set(ayahs.map(a => a.surah.name))];
-    const surahLabel = surahsOnPage.length === 1
-        ? surahsOnPage[0]
-        : surahsOnPage.length === 2
-            ? `${surahsOnPage[0]} • ${surahsOnPage[1]}`
-            : `${surahsOnPage[0]} ...`;
-    meta.innerHTML = `
-        <span style="color:var(--orange, #ff851b);">📖 ${surahLabel}</span>
-        &nbsp;|&nbsp;
-        <span>ص ${currentMushafPage}/604</span>
-        &nbsp;|&nbsp;
-        <span>الجزء ${getJuzFromPage(currentMushafPage)}</span>
-    `;
+    // ... إلخ
 }
-
 // ============================================================
 // ✅ جلب نص الصفحة - مع retry تلقائي 3 مرات، وعرض مستمر
 // ============================================================
@@ -2531,40 +2725,76 @@ async function loadPageText(pageNum, retryCount = 0) {
 // ============================================================
 // ✅ قائمة تشغيل/تفضيل عند الضغط على رقم الآية
 // ============================================================
-function showAyahMenu(surah, surahName, ayah, safeText, event) {
-    document.getElementById('ayah-action-menu')?.remove();
-    const isBookmarked = quranBookmarks.some(b => Number(b.surah_number) === surah && Number(b.ayah_number) === ayah);
+function showAyahMenu(surahNum, surahName, ayahNum, previewText, event) {
+    event.stopPropagation();
+    closeAyahMenu();
 
     const menu = document.createElement('div');
-    menu.id = 'ayah-action-menu';
+    menu.id = 'ayah-context-menu';
 
-    // حساب التموضع لضمان عدم خروجه من الشاشة
-    let topPos = event.pageY + 15;
-    let leftPos = Math.max(10, Math.min(window.innerWidth - 200, event.pageX - 100));
+    const rect = event.target.getBoundingClientRect();
+    const menuWidth = 220;
+    let leftPos = rect.left + window.scrollX - (menuWidth / 2) + (rect.width / 2);
+    leftPos = Math.max(8, Math.min(leftPos, window.innerWidth - menuWidth - 8));
+    const topPos = rect.bottom + window.scrollY + 8;
 
     menu.style.cssText = `
-        position:absolute; background:white; border:2px solid var(--orange, #ff851b); 
-        border-radius:15px; padding:8px 15px; display:flex; gap:18px; 
-        box-shadow:0 8px 25px rgba(0,0,0,0.2); z-index:10050; 
-        top:${topPos}px; left:${leftPos}px; align-items:center;
-        animation: menuFadeIn 0.2s ease-out;
+        position: absolute;
+        top: ${topPos}px;
+        left: ${leftPos}px;
+        width: ${menuWidth}px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.22);
+        border: 2px solid var(--orange, #ff851b);
+        z-index: 99999;
+        overflow: hidden;
+        animation: modalPop 0.2s ease;
+        direction: rtl;
     `;
+
+    const actions = [
+        { icon: '🔖', fn: `toggleAyahBookmark(${surahNum},'${surahName}',${ayahNum},'${previewText}'); closeAyahMenu();` },
+        { icon: '📋', fn: `copyAyahText(${surahNum},${ayahNum}); closeAyahMenu();` },
+        { icon: '🔊', fn: `playAyah(${surahNum},${ayahNum}); closeAyahMenu();` },
+        { icon: '🌐', fn: `showTafsir(${surahNum},${ayahNum}); closeAyahMenu();` },
+    ];
 
     menu.innerHTML = `
-        <div onclick="playAyah(${surah},${ayah})" title="تشغيل الصوت" style="cursor:pointer; font-size:24px;" id="play-btn-${surah}-${ayah}">▶️</div>
-        
-        <div onclick="toggleAyahBookmark(${surah},'${surahName}',${ayah},'${safeText}')" title="حفظ العلامة" style="cursor:pointer; font-size:24px;" id="ayah-bm-${surah}-${ayah}">
-            ${isBookmarked ? '🔖' : '🤍'}
+        <div style="padding:7px 14px; background:var(--dark-blue,#001f3f); color:white;
+            font-family:'Amiri Quran',serif; font-size:12px; text-align:center;">
+            ${surahName} • آية ${ayahNum}
         </div>
-
-        <div onclick="showTafsir(${surah},${ayah},'${surahName}')" title="تفسير الآية" style="cursor:pointer; font-size:24px;">📖</div>
-
-        <div style="width:1px; height:24px; background:#eee;"></div>
-
-        <div onclick="this.parentElement.remove()" style="cursor:pointer; font-size:20px; color:#ff4444; font-weight:bold; padding:2px;">✕</div>
+        <div style="display:flex; justify-content:space-evenly;
+            align-items:center; padding:12px 8px;">
+            ${actions.map(a => `
+                <div onclick="${a.fn}"
+                    style="width:46px; height:46px; border-radius:14px;
+                    background:#f5f5f5; border:1px solid #eee;
+                    display:flex; align-items:center; justify-content:center;
+                    font-size:22px; cursor:pointer;
+                    transition:transform 0.1s, background 0.15s;
+                    -webkit-tap-highlight-color:transparent;"
+                    onmousedown="this.style.transform='scale(0.88)'; this.style.background='#fff0e0';"
+                    onmouseup="this.style.transform='scale(1)';"
+                    ontouchstart="this.style.transform='scale(0.88)'; this.style.background='#fff0e0';"
+                    ontouchend="this.style.transform='scale(1)';">
+                    ${a.icon}
+                </div>
+            `).join('')}
+        </div>
     `;
-    
+
     document.body.appendChild(menu);
+
+    setTimeout(() => {
+        document.addEventListener('click', closeAyahMenu, { once: true });
+        document.addEventListener('touchstart', closeAyahMenu, { once: true, passive: true });
+    }, 10);
+}
+
+function closeAyahMenu() {
+    document.getElementById('ayah-context-menu')?.remove();
 }
 // ============================================================
 // ✅ Scroll + تعليم الآية
@@ -3528,6 +3758,7 @@ _supabase
         });
     })
     .subscribe();
+    initNavBehavior();
 </script>
 </body>
 </html>
