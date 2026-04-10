@@ -677,6 +677,27 @@ body.is-android #fingerprint-container {
     will-change: transform, opacity;
     contain: content;
 }
+/* زرار إغلاق عائم للـ Lightbox */
+.lightbox-close-overlay {
+    position: fixed;
+    top: 20px;
+    left: 20px; /* خليه على الشمال عشان ميتداراش لو الموقع فيه منيو يمين */
+    width: 45px;
+    height: 45px;
+    background: #ff4444;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    z-index: 2147483647; /* أعلى طبقة ممكنة */
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    border: 2px solid white;
+    -webkit-tap-highlight-color: transparent;
+}
     </style>
 </head>
 <body>
@@ -747,7 +768,19 @@ body.is-android #fingerprint-container {
             </div>
         </div>
 
-     <div id="mushaf-section" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; z-index: 9999999; background: #001f3f;">
+ <div id="mushaf-section" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; z-index: 9999999; background: #001f3f;">
+    <div onclick="changeView('active')" 
+         style="position: fixed; top: 15px; left: 15px; width: 35px; height: 35px; 
+                display: flex; align-items: center; justify-content: center; 
+                font-size: 20px; color: rgba(255,255,255,0.5); cursor: pointer; 
+                z-index: 100000000; transition: 0.2s;"
+         onmouseover="this.style.color='#ff851b'" 
+         onmouseout="this.style.color='rgba(255,255,255,0.5)'"
+         ontouchstart="this.style.color='#ff851b'"
+         ontouchend="this.style.color='rgba(255,255,255,0.5)'">✕</div>
+    
+    <iframe id="mushaf-frame" src="about:blank" style="width: 100%; height: 100%; border: none;"></iframe>
+</div>
     <iframe id="mushaf-frame" src="about:blank" style="width: 100%; height: 100%; border: none;"></iframe>
 </div>
         <div id="files-section" style="display:none; width: 100%; flex-direction: column; align-items: center;">
@@ -1553,7 +1586,6 @@ function renderAzkar(customList = null) {
 // ✅ الدالة الأساسية لتغيير التابات (تم حل مشكلة التعليق)
 // ============================================================
 function changeView(v) {
-    // تحديث الحالة الحالية
     currentView = v;
     isAzkarFocusMode = false;
     if(document.getElementById('fuzzySearch')) document.getElementById('fuzzySearch').value = '';
@@ -1575,61 +1607,51 @@ function changeView(v) {
         }
     });
 
-    // 2. إخفاء الأقسام
+    // 2. إخفاء الأقسام الأساسية
     const sections = ['notes-section', 'azkar-section', 'files-section'];
     sections.forEach(s => {
         const el = document.getElementById(s);
         if (el) el.style.display = 'none';
     });
 
-    // 3. التحكم في صندوق الإضافة والسيرش
+    // 3. التحكم في الـ UI الجانبي
     const entryForm = document.getElementById('entryForm');
     if (entryForm) entryForm.style.display = (v === 'active') ? 'block' : 'none';
     
     const searchBox = document.getElementById('fuzzySearch');
     if (searchBox) searchBox.style.display = (v === 'azkar' || v === 'files' || v === 'mushaf') ? 'none' : 'block';
-    
-    if (document.getElementById('fingerprint-container')) {
-        document.getElementById('fingerprint-container').style.display = 'none';
-    }
 
-    // 4. إظهار القسم المستهدف
-    const targetId = (v === 'active' || v === 'history') ? 'notes-section' : (v !== 'mushaf' ? v + '-section' : null);
-    if (targetId) {
+    // 4. منطق المصحف السحابي والزرار
+    const mushafSec = document.getElementById('mushaf-section');
+    const frame = document.getElementById('mushaf-frame');
+
+    if (v === 'mushaf') {
+        if (mushafSec) mushafSec.style.display = 'block'; 
+        if (frame) {
+            if (frame.src === "" || frame.src.includes('about:blank')) {
+                const userParam = encodeURIComponent(currentUser || localStorage.getItem('mouser'));
+                frame.src = `https://quran-rust.vercel.app/?user=${userParam}`;
+            }
+        }
+    } else {
+        // إخفاء المصحف فوراً لو اخترنا أي تابة تانية
+        if (mushafSec) mushafSec.style.display = 'none';
+        
+        // إظهار القسم المستهدف (نوتس أو غيره)
+        const targetId = (v === 'active' || v === 'history') ? 'notes-section' : v + '-section';
         const targetEl = document.getElementById(targetId);
         if (targetEl) targetEl.style.display = 'flex';
     }
 
-    // 5. تحميل البيانات أو تشغيل المصحف من الرابط الخارجي
+    // 5. تحميل البيانات
     setTimeout(() => {
-        if (v === 'files') {
-            fetchFiles();
-        } else if (v === 'azkar') {
+        if (v === 'files') fetchFiles();
+        else if (v === 'azkar') {
             if (!currentAzkarCategory) {
                 document.getElementById('category-selector').style.display = 'grid';
                 document.getElementById('azkar-list-view').style.display = 'none';
-            } else {
-                fetchAzkar();
-            }
-        } else if (v === 'mushaf') {
-            // ✅ الربط الجديد باللينك الخارجي يا Mo
-            const section = document.getElementById('mushaf-section');
-            const frame = document.getElementById('mushaf-frame');
-            
-            if (section) section.style.display = 'block'; 
-
-            if (frame) {
-                // لو الـ src لسه محملش، بنحمل لينك فيرسل الجديد وبنبعت اليوزر في الـ URL
-                if (frame.src === "" || frame.src.includes('about:blank')) {
-                    const userParam = encodeURIComponent(currentUser || localStorage.getItem('mouser'));
-                    frame.src = `https://quran-rust.vercel.app/?user=${userParam}`;
-                    console.log("Loading Cloud Mushaf for user:", currentUser);
-                }
-            }
-        } else {
-            if(document.getElementById('mushaf-section')) {
-                document.getElementById('mushaf-section').style.display = 'none';
-            }
+            } else fetchAzkar();
+        } else if (v !== 'mushaf') {
             fetchNotes(); 
         }
     }, 50); 
