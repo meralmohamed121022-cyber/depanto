@@ -1242,7 +1242,6 @@ function renderAzkar(customList = null) {
             `;
 
             card.innerHTML = `
-                <!-- زر الإغلاق -->
                 <div onclick="
                     isAzkarFocusMode = false;
                     const fc = document.getElementById('focus-card-overlay');
@@ -1257,7 +1256,6 @@ function renderAzkar(customList = null) {
                     -webkit-tap-highlight-color: transparent;
                 ">✕</div>
 
-                <!-- ✅ شريط الزوم العمودي على اليمين -->
                 <div style="
                     position: absolute;
                     right: 12px;
@@ -1293,8 +1291,6 @@ function renderAzkar(customList = null) {
                     <span style="font-size:11px; color:#aaa; font-family:sans-serif;">A-</span>
                 </div>
 
-                <!-- منطقة النص -->
-                <!-- padding-right: 55px عشان ميتداخلش مع شريط الزوم -->
                 <div style="
                     flex: 1;
                     width: 100%;
@@ -1324,7 +1320,6 @@ function renderAzkar(customList = null) {
                     >${zikr.text}</div>
                 </div>
 
-                <!-- شريط الأزرار السفلي -->
                 <div style="
                     position: absolute;
                     bottom: 30px; left: 0; right: 0;
@@ -1335,6 +1330,16 @@ function renderAzkar(customList = null) {
                     z-index: 10003;
                     pointer-events: none;
                 ">
+                    <div id="zikr-count-${zikr.id}" style="
+                        pointer-events: auto;
+                        font-size: clamp(60px, 18vw, 100px);
+                        color: var(--orange);
+                        font-family: 'Courier New', monospace;
+                        font-weight: bold;
+                        text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+                        line-height: 0.8;
+                    ">${zikr.count}</div>
+
                     <div style="display:flex; flex-direction:column; align-items:center; pointer-events:auto;">
                         <button class="azkar-reset"
                             onclick="event.stopPropagation(); resetZikr('${zikr.id}')"
@@ -1347,16 +1352,6 @@ function renderAzkar(customList = null) {
                             padding:2px 6px; border-radius:4px;
                         ">${zikr.target || '∞'}</span>
                     </div>
-
-                    <div id="zikr-count-${zikr.id}" style="
-                        pointer-events: auto;
-                        font-size: clamp(60px, 18vw, 100px);
-                        color: var(--orange);
-                        font-family: 'Courier New', monospace;
-                        font-weight: bold;
-                        text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
-                        line-height: 0.8;
-                    ">${zikr.count}</div>
                 </div>
             `;
 
@@ -1368,7 +1363,6 @@ function renderAzkar(customList = null) {
         addContainer.style.display = customList ? 'none' : 'flex';
         if (fingerprint) fingerprint.style.display = 'none';
 
-        // ✅ زرار تصفير الكل - يظهر فوق القائمة فقط لو مش بحث
         if (!customList && currentAzkarCategory) {
             const resetAllBtn = document.createElement('button');
             resetAllBtn.className = 'auth-btn';
@@ -1433,11 +1427,11 @@ function renderAzkar(customList = null) {
             };
             card.innerHTML = `
                 <div style="display:flex; align-items:center;">
+                    <div class="azkar-counter" id="zikr-count-${zikr.id}" style="text-align: left; min-width: 50px;">${zikr.count}</div>
                     <button class="azkar-reset"
                         onclick="event.stopPropagation(); resetZikr('${zikr.id}')"
-                        style="width:35px; height:35px; box-shadow:0 3px 0 var(--book-spine);">
+                        style="width:35px; height:35px; box-shadow:0 3px 0 var(--book-spine); margin-left: 10px;">
                     </button>
-                    <div class="azkar-counter" id="zikr-count-${zikr.id}">${zikr.count}</div>
                 </div>
                 <div style="display:flex; flex-direction:column; align-items:flex-end;">
                     <div class="azkar-text" style="font-family:'Amiri Quran',serif;">
