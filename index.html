@@ -1675,6 +1675,10 @@ function initNavBehavior() {
 // ✅ Swipe للتنقل بين الـ views
 // ============================================================
 (function setupSwipeNav() {
+    // [Inference] تعطيل السويب بين التابات بناءً على طلب Mo لمنع التداخل مع العناصر الداخلية
+    return; 
+
+    // الكود اللي تحت ده مش هيتنفذ، فبالتالي التنقل هيكون بالضغط فقط
     const views = ['active', 'azkar', 'mushaf', 'files', 'history'];
     let touchStartX = 0, touchStartY = 0;
 
@@ -1687,18 +1691,13 @@ function initNavBehavior() {
     }, { passive: true });
 
     container.addEventListener('touchend', e => {
-        // ✅ منع السويب لو المصحف مفتوح عشان ميتداخلوش
         if (document.getElementById('mushaf-overlay')) return;
         
-        // لو عايز تقفل السويب خالص بين التابات حتى بره المصحف، فعل السطر اللي جاي ده:
-        // return; 
-
         if (typeof Android === 'undefined') return; 
         
         const dx = e.changedTouches[0].clientX - touchStartX;
         const dy = Math.abs(e.changedTouches[0].clientY - touchStartY);
         
-        // شرط حساس لضمان إنك قاصد تسحب مش بتعمل سكرول عادي
         if (Math.abs(dx) < 80 || dy > 50) return; 
         
         const idx = views.indexOf(currentView);
