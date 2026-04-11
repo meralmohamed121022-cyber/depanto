@@ -1586,11 +1586,27 @@ function renderAzkar(customList = null) {
 // ✅ الدالة الأساسية لتغيير التابات (تم حل مشكلة التعليق)
 // ============================================================
 function changeView(v) {
+    // 1. منطق المصحف (فتح خارجي) - بنتعامل معاه قبل أي تغيير في الـ UI
+    if (v === 'mushaf') {
+        const activeUser = currentUser || localStorage.getItem('mouser');
+        const userParam = encodeURIComponent(activeUser || "");
+        const targetUrl = `https://quran-rust.vercel.app/?user=${userParam}`;
+
+        if (typeof Android !== 'undefined') {
+            Android.openExternal(targetUrl); // لو فاتح من تطبيق الأندرويد
+        } else {
+            window.open(targetUrl, '_blank'); // لو فاتح من المتصفح
+        }
+        
+        // مش هنكمل باقي الدالة عشان نفضل واقفين في مكاننا بالأبلكيشن
+        return; 
+    }
+
     currentView = v;
     isAzkarFocusMode = false;
     if(document.getElementById('fuzzySearch')) document.getElementById('fuzzySearch').value = '';
 
-    // 1. تحديث شكل الأزرار
+    // 2. تحديث شكل الأزرار (إزالة active من الكل وإضافتها للتاب المختار)
     const tabs = {
         'active': 'tabActive',
         'azkar': 'tabAzkar',
@@ -1602,48 +1618,30 @@ function changeView(v) {
     Object.keys(tabs).forEach(key => {
         const btn = document.getElementById(tabs[key]);
         if (btn) {
-            if (v === key) btn.classList.add('active');
-            else btn.classList.remove('active');
+            btn.classList.toggle('active', v === key);
         }
     });
 
-    // 2. إخفاء الأقسام الأساسية
-    const sections = ['notes-section', 'azkar-section', 'files-section'];
+    // 3. إخفاء الأقسام الأساسية
+    const sections = ['notes-section', 'azkar-section', 'files-section', 'mushaf-section'];
     sections.forEach(s => {
         const el = document.getElementById(s);
         if (el) el.style.display = 'none';
     });
 
-    // 3. التحكم في الـ UI الجانبي
+    // 4. التحكم في الـ UI الجانبي (الفورم والبحث)
     const entryForm = document.getElementById('entryForm');
     if (entryForm) entryForm.style.display = (v === 'active') ? 'block' : 'none';
     
     const searchBox = document.getElementById('fuzzySearch');
-    if (searchBox) searchBox.style.display = (v === 'azkar' || v === 'files' || v === 'mushaf') ? 'none' : 'block';
+    if (searchBox) searchBox.style.display = (v === 'azkar' || v === 'files') ? 'none' : 'block';
 
-    // 4. منطق المصحف السحابي والزرار
-    const mushafSec = document.getElementById('mushaf-section');
-    const frame = document.getElementById('mushaf-frame');
+    // 5. إظهار القسم المستهدف
+    const targetId = (v === 'active' || v === 'history') ? 'notes-section' : v + '-section';
+    const targetEl = document.getElementById(targetId);
+    if (targetEl) targetEl.style.display = 'flex';
 
-    if (v === 'mushaf') {
-        if (mushafSec) mushafSec.style.display = 'block'; 
-        if (frame) {
-            if (frame.src === "" || frame.src.includes('about:blank')) {
-                const userParam = encodeURIComponent(currentUser || localStorage.getItem('mouser'));
-                frame.src = `https://quran-rust.vercel.app/?user=${userParam}`;
-            }
-        }
-    } else {
-        // إخفاء المصحف فوراً لو اخترنا أي تابة تانية
-        if (mushafSec) mushafSec.style.display = 'none';
-        
-        // إظهار القسم المستهدف (نوتس أو غيره)
-        const targetId = (v === 'active' || v === 'history') ? 'notes-section' : v + '-section';
-        const targetEl = document.getElementById(targetId);
-        if (targetEl) targetEl.style.display = 'flex';
-    }
-
-    // 5. تحميل البيانات
+    // 6. تحميل البيانات بتأخير بسيط للأداء
     setTimeout(() => {
         if (v === 'files') fetchFiles();
         else if (v === 'azkar') {
@@ -1651,7 +1649,7 @@ function changeView(v) {
                 document.getElementById('category-selector').style.display = 'grid';
                 document.getElementById('azkar-list-view').style.display = 'none';
             } else fetchAzkar();
-        } else if (v !== 'mushaf') {
+        } else {
             fetchNotes(); 
         }
     }, 50); 
