@@ -2646,7 +2646,9 @@ async function fetchAzkar() {
 
         if (data && data.length > 0) {
             const matched = data.filter(z => z.category === currentAzkarCategory);
-            source = matched.length > 0 ? matched : defaults;
+            const dbIds = new Set(matched.map(m => m.id));
+            const missingDefaults = defaults.filter(d => !dbIds.has(d.id));
+            source = [...missingDefaults, ...matched];
         } else {
             source = defaults;
         }
@@ -2667,9 +2669,9 @@ async function fetchAzkar() {
                 id: z.id || `zikr-${i}`,
                 text: z.text || '',
                 category: z.category || currentAzkarCategory,
-                count: Number.isFinite(Number(z.count)) ? Number(z.count) : 0,
+                count: 0,
                 target: Number.isFinite(Number(z.target)) ? Number(z.target) : 1,
-                ownername: z.ownername || currentUser
+                ownername: currentUser
             }));
     }
 
@@ -2677,7 +2679,8 @@ async function fetchAzkar() {
     document.getElementById('category-selector').style.display = 'none';
     document.getElementById('azkar-list-view').style.display = 'flex';
     renderAzkar();
-}    
+}
+
 function getCategoryName(cat) {
     const names = {
         morning: '☀️ أذكار الصباح',
@@ -2899,7 +2902,7 @@ function renderAzkar(customList = null) {
     }
 }  
 
-function incrementSelectedZikr() {
+async function incrementSelectedZikr() {
     if (!selectedZikrId) return;
     const zikrIndex = azkarList.findIndex(z => z.id === selectedZikrId);
     const zikr = azkarList[zikrIndex];
@@ -2910,16 +2913,23 @@ function incrementSelectedZikr() {
     if (counterEl) counterEl.innerText = zikr.count;
     if (navigator.vibrate) navigator.vibrate(40);
 
-    // ✅ sync لـ D1 بس لو مش من الكونست
-    if (!zikr.id.startsWith('default-')) {
-        fetch(`${APIURL}/azkar-update`, {
+    try {
+        await fetch(`${API_URL}/azkar-update`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: zikr.id, count: zikr.count })
-        }).catch(err => console.error('Sync failed:', err));
+            body: JSON.stringify({
+                id: zikr.id,
+                count: zikr.count,
+                text: zikr.text,
+                target: zikr.target,
+                category: zikr.category,
+                owner_name: currentUser
+            })
+        });
+    } catch (err) {
+        console.error('Sync failed:', err);
     }
 
-    // Target check
     if (zikr.target > 0 && zikr.count >= zikr.target) {
         if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
         if (zikrIndex < azkarList.length - 1) {
